@@ -174,47 +174,7 @@
     //////////////////////////////////////////////////////
     // START TRACKING
     //////////////////////////////////////////////////////
-    navigator.permissions.query({ name: 'geolocation' })
-    .then(permission => {
-        console.log("Permission state:", permission.state);
-    });
-    function startTracking() {
-
-    watchId = navigator.geolocation.watchPosition(
-
-        (position) => {
-
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            console.log("LIVE:", lat, lng);
-
-            vehicleMarker.setLatLng([lat, lng]);
-
-            routingControl.setWaypoints([
-                L.latLng(startLat, startLng),
-                L.latLng(lat, lng)
-            ]);
-
-            map.setView([lat, lng]);
-
-        },
-
-        (error) => {
-
-            console.log(error);
-
-            alert(error.message);
-
-        },
-
-        {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 1000
-        }
-    );
-}
+    
     document.getElementById("start").addEventListener("click", () => {
 
         if (!navigator.geolocation) {
