@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Live Tracking</title>
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Routing Machine -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            width:100%;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            overflow:hidden;
+        }
+
+        .buttons{
+            display:flex;
+            gap:10px;
+        }
+
+        button{
+            padding:10px 20px;
+            cursor:pointer;
+            border:none;
+            border-radius:5px;
+            background:black;
+            color:white;
+        }
+
+        #map{
+            width:95%;
+            height:90%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="buttons">
+        <button id="start">Start Tracking</button>
+        <button id="stop">Stop Tracking</button>
+    </div>
+
+    <div id="map"></div>
+
+<script>
+
+    //////////////////////////////////////////////////////
+    // MAP
+    //////////////////////////////////////////////////////
+
+    const map = L.map('map').setView(
+        [-26.018693909315516, 32.40030973248349],
+        18
+    );
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+    //////////////////////////////////////////////////////
+    // ICONS
+    //////////////////////////////////////////////////////
+
+    const startIcon = L.icon({
+        iconUrl: 'house-50.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40]
+    });
+
+    const vehicleIcon = L.icon({
+        iconUrl: 'icons8-car-50.png',
+        iconSize: [50, 50],
+        iconAnchor: [25, 25]
+    });
+
+    //////////////////////////////////////////////////////
+    // START LOCATION
+    //////////////////////////////////////////////////////
+
+    const startLat = -26.019042486045866;
+    const startLng = 32.40057233099401;
+
+    //////////////////////////////////////////////////////
+    // START MARKER
+    //////////////////////////////////////////////////////
+
+    L.marker(
+        [startLat, startLng],
+        { icon: startIcon }
+    )
+    .addTo(map)
+    .bindPopup("Starting Point")
+    .openPopup();
+
+    //////////////////////////////////////////////////////
+    // VEHICLE MARKER
+    //////////////////////////////////////////////////////
+
+    let vehicleMarker = L.marker(
+        [startLat, startLng],
+        { icon: vehicleIcon }
+    )
+    .addTo(map)
+    .bindPopup("Live Vehicle");
+
+    //////////////////////////////////////////////////////
+    // ROUTING CONTROL (CREATE ONLY ONCE)
+    //////////////////////////////////////////////////////
+
+        let routingControl = L.Routing.control({
+
+        waypoints: [
+            L.latLng(startLat, startLng),
+            L.latLng(startLat, startLng)
+        ],
+
+        lineOptions: {
+            styles: [
+                {
+                    color: "blue",
+                    weight: 5,
+                    opacity: 0.7
+                }
+            ]
+        },
+
+        createMarker: function () {
+            return null;
+        },
+
+        addWaypoints: false,
+        draggableWaypoints: false,
+        fitSelectedRoutes: true,
+        show: false
+
+    }).addTo(map);
+
+    //////////////////////////////////////////////////////
+    // GEOLOCATION
+    //////////////////////////////////////////////////////
+
+    let watchId = null;
+
+    //////////////////////////////////////////////////////
+    // START TRACKING
+    //////////////////////////////////////////////////////
+    navigator.permissions.query({ name: 'geolocation' })
+    .then(permission => {
+        console.log("Permission state:", permission.state);
+    });
+    function startTracking() {
+
+    watchId = navigator.geolocation.watchPosition(
+
+        (position) => {
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            console.log("LIVE:", lat, lng);
+
+            vehicleMarker.setLatLng([lat, lng]);
+
+            routingControl.setWaypoints([
+                L.latLng(startLat, startLng),
+                L.latLng(lat, lng)
+            ]);
+
+            map.setView([lat, lng]);
+
+        },
+
+        (error) => {
+
+            console.log(error);
+
+            alert(error.message);
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 1000
+        }
+    );
+}
+    document.getElementById("start").addEventListener("click", () => {
+
+        if (!navigator.geolocation) {
+            alert("Geolocation not supported");
+            return;
+        }
+
+        if (watchId !== null) {
+            alert("Already tracking");
+            return;
+        }
+
+        watchId = navigator.geolocation.watchPosition(
+
+            //////////////////////////////////////////////////////
+            // SUCCESS
+            //////////////////////////////////////////////////////
+
+            (position) => {
+
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                console.log("LIVE:", lat, lng);
+
+                //////////////////////////////////////////////////////
+                // MOVE VEHICLE MARKER
+                //////////////////////////////////////////////////////
+
+                vehicleMarker.setLatLng([lat, lng]);
+
+                //////////////////////////////////////////////////////
+                // UPDATE ROUTE
+                //////////////////////////////////////////////////////
+
+                routingControl.setWaypoints([
+                    L.latLng(startLat, startLng),
+                    L.latLng(lat, lng)
+                ]);
+
+                //////////////////////////////////////////////////////
+                // CENTER MAP
+                //////////////////////////////////////////////////////
+
+                map.setView([lat, lng]);
+
+            },
+
+            //////////////////////////////////////////////////////
+            // ERROR
+            //////////////////////////////////////////////////////
+
+            (error) => {
+
+                console.log(error);
+
+                switch(error.code){
+
+                    case error.PERMISSION_DENIED:
+                        alert("Location permission denied");
+                        break;
+
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Location unavailable");
+                        break;
+
+                    case error.TIMEOUT:
+                        alert("Location timeout");
+                        break;
+
+                    default:
+                        alert("Unknown error");
+                }
+            },
+
+            //////////////////////////////////////////////////////
+            // OPTIONS
+            //////////////////////////////////////////////////////
+
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 1000
+            }
+        );
+
+    });
+
+    //////////////////////////////////////////////////////
+    // STOP TRACKING
+    //////////////////////////////////////////////////////
+
+    document.getElementById("stop").addEventListener("click", () => {
+
+        if (watchId !== null) {
+
+            navigator.geolocation.clearWatch(watchId);
+
+            watchId = null;
+
+            console.log("Tracking stopped");
+
+            alert("Tracking stopped");
+        }
+    });
+
+</script>
+
+</body>
+</html>
