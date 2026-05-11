@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+        #map{
+            height: 90%;
+            width: 90%;
+            
+        }
+    </style>
+</head>
+<body>
+    <button id="start">Start Tracking</button>
+    <button id="stop">Stop Tracking</button>
+    <div id="map"></div>
+    <script>
+        var latitudePos = null;
+        var longitudePOs = null; 
+        const startIcon = L.icon({
+            iconUrl: 'house-50.png',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+        });
+
+        const endIcon = L.icon({
+            iconUrl: 'yellow_bus.png',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+        });
+
+        // L.map('map').setView([latitude, longitude], zoom);
+        var map = L.map('map').setView([-26.018693909315516, 32.40030973248349], 19);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        /* Dark theme
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        */
+
+
+        /*** Custom icon for the marker
+         * iconUrl: URL of the custom icon image
+         * iconSize: Size of the icon (width, height)
+         * iconAnchor: Point of the icon which will correspond to marker's location (x, y)
+         * popupAnchor: Point from which the popup should open relative to the iconAnchor (x, y)
+         * shadowSize: Size of the shadow image (width, height)
+         * shadowAnchor: Point of the shadow which will correspond to marker's location (x, y)
+         */
+        var myIcon = L.icon({
+            iconUrl: 'icons8-car-50.png',
+            iconSize: [50,50],
+            iconAnchor: [25, 25],
+            popupAnchor: [0, 0],
+            shadowAnchor: [22, 94]
+        });
+        L.marker([-26.018987531623786, 32.40040846437449])
+            .addTo(map)
+            .bindPopup('Portaria da Unitiva')
+            .openPopup();
+        // L.marker([-26.019385702545595, 32.40054715143528], {icon: myIcon})
+        L.marker([-26.019385702545595, 32.40054715143528],{icon: myIcon})
+            .addTo(map)
+            .bindPopup('Carrinha da Unitiva')
+            .openPopup();
+            
+        L.Routing.control({
+            waypoints: [
+                L.latLng(-26.019042486045866, 32.40057233099401), // start
+                L.latLng(-26.019385702545595, 32.40054715143528)      // end
+            ],
+            lineOptions: {
+            styles: [
+                {
+                    color: 'blue',
+                    weight: 5,
+                    opacity: 0.7
+                }
+                ]
+            },show: false,
+            createMarker: function(i, waypoint, n) {
+                if (i === 0) {
+                    return L.marker(waypoint.latLng, { icon: startIcon });
+                } else if (i === n - 1) {
+                    return L.marker(waypoint.latLng, { icon: endIcon });
+                } else {
+                    return L.marker(waypoint.latLng);
+                }
+            }
+            
+    
+            
+        }).addTo(map);
+        
+   ///////////////////////////////////////////////////////
+    let watchId = null;
+    let lastPosition = null;
+    
+    // Start tracking
+    document.getElementById("start").addEventListener("click", (e) => {
+        e.preventDefault()
+        if (!navigator.geolocation) {
+            console.log("Geolocation not supported");
+            return;
+        }
+
+        if (watchId !== null) {
+            console.log("Already tracking...");
+            return;
+        }
+
+        watchId = navigator.geolocation.watchPosition(
+
+            // ✅ SUCCESS
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                latitudePos = pos.coords.latitude;
+                L.Routing.control({
+                    waypoints: [
+                        L.latLng(-26.019042486045866, 32.40057233099401), // start
+                        L.latLng(lat, lng )      // end
+                    ],
+                    lineOptions: {
+                    styles: [
+                        {
+                            color: 'blue',
+                            weight: 5,
+                            opacity: 0.7
+                        }
+                        ]
+                    },show: false // hides the routing control panel
+                    
+                }).addTo(map);
+
+                console.log("📍 Live Location:", lat, lng );
+            },
+
+            // ❌ ERROR HANDLER
+            (err) => {
+                console.log("⚠️ Error:", err.message);
+
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        console.log("User denied location access");
+                        break;
+
+                    case err.POSITION_UNAVAILABLE:
+                        console.log("Location unavailable (Mac/Wi-Fi issue)");
+                        break;
+
+                    case err.TIMEOUT:
+                        console.log("Request timed out, retrying...");
+                        retryLocation();
+                        break;
+
+                    default:
+                        console.log("Unknown error");
+                }
+
+                    // 🔁 fallback to last known position
+                    if (lastPosition) {
+                        console.log("📌 Using last known location:",
+                            lastPosition.coords.latitude,
+                            lastPosition.coords.longitude
+                        );
+                    }
+                },
+
+                // ⚙️ OPTIONS (optimized for Mac + general use)
+                {
+                    enableHighAccuracy: false,
+                    timeout: 20000,
+                    maximumAge: 10000
+                }
+            );
+        });
+
+        // Stop tracking
+        document.getElementById("stop").addEventListener("click", () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                console.log("🛑 Tracking stopped");
+            }
+    });
+
+    // 🔁 Retry function
+    function retryLocation() {
+        setTimeout(() => {
+            console.log("🔄 Retrying location...");
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    console.log("✅ Retry success:",
+                        pos.coords.latitude,
+                        pos.coords.longitude
+                    );
+                    lastPosition = pos;
+                },
+                (err) => {
+                    console.log("❌ Retry failed:", err.message);
+                }
+            );
+        }, 3000);
+    }
+
+</script>
+
+</body>
+</html>
