@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: #0b1220;
+            color: #c9d8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(90deg, #0f1e35, #162840);
+            border-bottom: 1px solid #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header span {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            letter-spacing: 3px;
+            color: #4ea8de;
+            text-transform: uppercase;
+        }
+
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #4ea8de;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        .controls {
+            width: 90%;
+            max-width: 860px;
+            margin: 18px 0 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .input-group label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #4ea8de;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            background: #0f1e35;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            color: #e0ecff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            padding: 9px 12px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .input-group input:focus {
+            border-color: #4ea8de;
+            box-shadow: 0 0 0 2px rgba(78,168,222,0.15);
+        }
+
+        .input-group input::placeholder {
+            color: #3a5272;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        button:active { transform: scale(0.97); }
+
+        #start {
+            background: #1a6fa8;
+            color: #e0f0ff;
+        }
+        #start:hover { background: #2280bf; }
+
+        #stop {
+            background: #8b2020;
+            color: #ffe0e0;
+        }
+        #stop:hover { background: #a02828; }
+
+        #update-dest {
+            background: #1a5f3a;
+            color: #d0ffe8;
+        }
+        #update-dest:hover { background: #226b45; }
+
+        #status {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #4ea8de;
+            margin-bottom: 6px;
+            width: 90%;
+            max-width: 860px;
+            min-height: 18px;
+            letter-spacing: 1px;
+        }
+
+        #map {
+            height: calc(100vh - 220px);
+            min-height: 360px;
+            width: 90%;
+            max-width: 860px;
+            border-radius: 10px;
+            border: 1px solid #1e3a5f;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="dot"></div>
+        <span>Live Tracker</span>
+    </header>
+
+    <div class="controls">
+        <div class="input-group">
+            <label>Destino — Latitude</label>
+            <input type="number" id="dest-lat" step="any" placeholder="-26.019042" value="-26.019042486045866" />
+        </div>
+        <div class="input-group">
+            <label>Destino — Longitude</label>
+            <input type="number" id="dest-lng" step="any" placeholder="32.400572" value="32.40057233099401" />
+        </div>
+        <button id="update-dest">Actualizar Destino</button>
+        <button id="start">▶ Iniciar</button>
+        <button id="stop">■ Parar</button>
+    </div>
+
+    <div id="status">— Aguardando...</div>
+    <div id="map"></div>
+
+    <script>
+        // ── State ──────────────────────────────────────────────
+        let watchId      = null;
+        let lastPosition = null;
+        let routingControl = null;
+
+        // Destination (editable via inputs)
+        let destLat = parseFloat(document.getElementById('dest-lat').value);
+        let destLng = parseFloat(document.getElementById('dest-lng').value);
+
+        const statusEl = document.getElementById('status');
+
+        // ── Map setup ──────────────────────────────────────────
+        const map = L.map('map').setView([-26.018693909315516, 32.40030973248349], 19);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // ── Icons ──────────────────────────────────────────────
+        const myIcon = L.icon({
+            iconUrl: 'icons8-car-50.png',
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+            popupAnchor: [0, 0]
+        });
+
+        // Static markers
+        L.marker([-26.018987531623786, 32.40040846437449])
+            .addTo(map)
+            .bindPopup('Portaria da Unitiva');
+
+        L.marker([-26.019385702545595, 32.40054715143528], { icon: myIcon })
+            .addTo(map)
+            .bindPopup('Carrinha da Unitiva');
+
+        // ── Destination marker (draggable visual indicator) ────
+        let destMarker = L.marker([destLat, destLng], {
+            title: 'Destino'
+        }).addTo(map).bindPopup('Destino');
+
+        // ── Routing helper ─────────────────────────────────────
+        function buildRoute(fromLat, fromLng) {
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(fromLat, fromLng),
+                    L.latLng(destLat, destLng)
+                ],
+                lineOptions: {
+                    styles: [{ color: '#4ea8de', weight: 5, opacity: 0.8 }]
+                },
+                show: false,
+                addWaypoints: false,
+                routeWhileDragging: false
+            }).addTo(map);
+        }
+
+        // ── Update Destination button ──────────────────────────
+        document.getElementById('update-dest').addEventListener('click', () => {
+            const newLat = parseFloat(document.getElementById('dest-lat').value);
+            const newLng = parseFloat(document.getElementById('dest-lng').value);
+
+            if (isNaN(newLat) || isNaN(newLng)) {
+                statusEl.textContent = '⚠ Coordenadas inválidas.';
+                return;
+            }
+
+            destLat = newLat;
+            destLng = newLng;
+
+            // Move destination marker
+            destMarker.setLatLng([destLat, destLng]);
+            destMarker.bindPopup(`Destino: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}`);
+
+            statusEl.textContent = `✔ Destino actualizado → ${destLat.toFixed(6)}, ${destLng.toFixed(6)}`;
+
+            // Rebuild route if we have a last known position
+            if (lastPosition) {
+                buildRoute(lastPosition.coords.latitude, lastPosition.coords.longitude);
+            }
+        });
+
+        // ── Start tracking ─────────────────────────────────────
+        document.getElementById('start').addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!navigator.geolocation) {
+                statusEl.textContent = '⚠ Geolocalização não suportada.';
+                return;
+            }
+
+            if (watchId !== null) {
+                statusEl.textContent = '… Rastreamento já activo.';
+                return;
+            }
+
+            statusEl.textContent = '🔍 A obter localização...';
+
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    lastPosition = pos;
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    statusEl.textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                    buildRoute(lat, lng);
+                },
+                (err) => {
+                    statusEl.textContent = `⚠ Erro: ${err.message}`;
+
+                    switch (err.code) {
+                        case err.PERMISSION_DENIED:
+                            statusEl.textContent = '⛔ Acesso à localização negado.';
+                            break;
+                        case err.POSITION_UNAVAILABLE:
+                            statusEl.textContent = '⚠ Localização indisponível.';
+                            break;
+                        case err.TIMEOUT:
+                            statusEl.textContent = '⏱ Timeout — a tentar novamente...';
+                            retryLocation();
+                            break;
+                    }
+
+                    if (lastPosition) {
+                        statusEl.textContent += ' (usando última posição conhecida)';
+                    }
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 20000,
+                    maximumAge: 10000
+                }
+            );
+        });
+
+        // ── Stop tracking ──────────────────────────────────────
+        document.getElementById('stop').addEventListener('click', () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                statusEl.textContent = '🛑 Rastreamento parado.';
+            }
+        });
+
+        // ── Retry ──────────────────────────────────────────────
+        function retryLocation() {
+            setTimeout(() => {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        lastPosition = pos;
+                        statusEl.textContent = `✅ Retry OK: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+                    },
+                    (err) => {
+                        statusEl.textContent = `❌ Retry falhou: ${err.message}`;
+                    }
+                );
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
