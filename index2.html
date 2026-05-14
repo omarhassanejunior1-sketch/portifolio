@@ -11,7 +11,9 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
      <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+     <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600&display=swap');
 
@@ -26,6 +28,7 @@
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: scroll;
         }
 
         header {
@@ -149,12 +152,20 @@
             min-height: 18px;
             letter-spacing: 1px;
         }
+        #rotate{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #rotate span {
+            font-size: 18px;
+        }
 
         #map {
-            height: calc(100vh - 220px);
-            min-height: 360px;
+            height: 100%;
+            min-height: 500px;
             width: 90%;
-            max-width: 860px;
+            max-width: 90%;
             border-radius: 10px;
             border: 1px solid #1e3a5f;
             box-shadow: 0 4px 32px rgba(0,0,0,0.5);
@@ -181,6 +192,7 @@
         <button id="update-dest">Actualizar Destino</button>
         <button id="start">▶ Iniciar</button>
         <button id="stop">■ Parar</button>
+        <button id="rotate"><span>↻</span> Rodar</button>
     </div>
 
     <div id="status">— Aguardando...</div>
@@ -199,7 +211,12 @@
         const statusEl = document.getElementById('status');
 
         // ── Map setup ──────────────────────────────────────────
-        const map = L.map('map').setView([-26.018693909315516, 32.40030973248349], 22);
+        const map = L.map('map', { 
+            rotate: true ,
+            bearing: 0,
+            touchRotate: true,
+            rotateControl: true,})
+        .setView([-26.018693909315516, 32.40030973248349], 22);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
@@ -246,6 +263,12 @@
                 routeWhileDragging: false
             }).addTo(map);
         }
+        /// ── Rotate map button ─────────────────────────────────
+        document.getElementById('rotate').addEventListener('click', () => {
+            //map.setBearing(90);  
+            map.setBearing(map.getBearing() + 15);
+            //alert('Funcionalidade de rotação ainda não implementada.'); // Placeholder para futura implementação
+        });
 
         // ── Update Destination button ──────────────────────────
         document.getElementById('update-dest').addEventListener('click', () => {
