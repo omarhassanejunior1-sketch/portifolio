@@ -221,8 +221,7 @@
             console.log("Alpha (compass direction):", event.alpha);
             console.log("Beta front/back tilt:", event.beta);
             console.log("Gamma (left/right):", event.gamma);
-
-            });
+        });
         // ── State ──────────────────────────────────────────────
         let watchId      = null;
         let lastPosition = null;
@@ -246,6 +245,18 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
+        window.addEventListener("deviceorientation", (event) => {
+            //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
+            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
+            if(map.setBearing) {
+                map.setBearing(parseFloat(event.alpha));
+            } else {
+                console.warn("Map rotation not supported in this Leaflet version.");
+            }
+            console.log("Alpha (compass direction):", event.alpha);
+            console.log("Beta front/back tilt:", event.beta);
+            console.log("Gamma (left/right):", event.gamma);
+        });
         // ── Icons ──────────────────────────────────────────────
         const myIcon = L.icon({
             iconUrl: 'icons8-car-50.png',
