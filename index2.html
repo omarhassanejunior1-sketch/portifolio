@@ -205,18 +205,20 @@
         <button id="start">▶ Iniciar</button>
         <button id="stop">■ Parar</button>
         <button id="rotate"><span>↻</span> Rodar</button>
-        <span id="mobile-orientation"> </span>
+        <br>
+        
     </div>
-
+    <span id="mobile-orientation"> </span>
+    <span id="mobile-speed">  </span>
     <div id="status">— Aguardando...</div>
     <div id="map"></div>
 
     <script>
-
+        
 
         window.addEventListener("deviceorientation", (event) => {
             //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
+            document.getElementById('mobile-orientation').textContent = `Alpha (direção do compasso ): ${event.alpha}° `;
             map.setBearing(event.alpha);
             console.log("Alpha (compass direction):", event.alpha);
             console.log("Beta front/back tilt:", event.beta);
@@ -334,7 +336,7 @@
         // ── Start tracking ─────────────────────────────────────
         document.getElementById('start').addEventListener('click', (e) => {
             e.preventDefault();
-
+            
             if (!navigator.geolocation) {
                 statusEl.textContent = '⚠ Geolocalização não suportada.';
                 return;
@@ -349,6 +351,8 @@
 
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
+                    document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
+                    console.log(`Speed: ${pos.coords.speed}`)
                     lastPosition = pos;
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
