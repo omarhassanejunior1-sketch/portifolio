@@ -205,12 +205,22 @@
         <button id="start">▶ Iniciar</button>
         <button id="stop">■ Parar</button>
         <button id="rotate"><span>↻</span> Rodar</button>
+        <span id="mobile-orientation"> </span>
     </div>
 
     <div id="status">— Aguardando...</div>
     <div id="map"></div>
 
     <script>
+
+
+        window.addEventListener("deviceorientation", (event) => {
+            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
+            console.log("Alpha (compass direction):", event.alpha);
+            console.log("Beta front/back tilt:", event.beta);
+            console.log("Gamma (left/right):", event.gamma);
+
+            });
         // ── State ──────────────────────────────────────────────
         let watchId      = null;
         let lastPosition = null;
@@ -243,13 +253,14 @@
         });
 
         // Static markers
-        L.marker([-26.018987531623786, 32.40040846437449])
+        /*L.marker([-26.018987531623786, 32.40040846437449])
             .addTo(map)
             .bindPopup('Portaria da Unitiva');
 
         L.marker([-26.019385702545595, 32.40054715143528], { icon: myIcon })
             .addTo(map)
             .bindPopup('Carrinha da Unitiva');
+        */
 
         // ── Destination marker (draggable visual indicator) ────
         let destMarker = L.marker([destLat, destLng], {
