@@ -261,7 +261,7 @@
         });
         // ── Icons ──────────────────────────────────────────────
         const myIcon = L.icon({
-            iconUrl: 'icons8-car-50.png',
+            iconUrl: 'bus.svg',
             iconSize: [50, 50],
             iconAnchor: [25, 25],
             popupAnchor: [0, 0]
@@ -271,17 +271,22 @@
         /*L.marker([-26.018987531623786, 32.40040846437449])
             .addTo(map)
             .bindPopup('Portaria da Unitiva');
-
+        
         L.marker([-26.019385702545595, 32.40054715143528], { icon: myIcon })
             .addTo(map)
             .bindPopup('Carrinha da Unitiva');
+        
         */
-
         // ── Destination marker (draggable visual indicator) ────
         let destMarker = L.marker([destLat, destLng], {
-            title: 'Destino'
+            title: 'Destino',icon: L.icon({
+                iconUrl: 'house-50.png',
+                iconSize: [40, 40],
+                iconAnchor: [20, 40]
+            }),
+            draggable: true
         }).addTo(map).bindPopup('Destino');
-
+        
         // ── Routing helper ─────────────────────────────────────
         function buildRoute(fromLat, fromLng) {
             if (routingControl) {
@@ -296,6 +301,33 @@
                 lineOptions: {
                     styles: [{ color: '#4ea8de', weight: 5, opacity: 0.8 }]
                 },
+                // CUSTOM MARKERS
+                createMarker: function(i, wp) {
+
+                    // START MARKER
+                    if (i === 0) {
+
+                        return L.marker(wp.latLng, {
+                            icon: L.icon({
+                                iconUrl: 'bus.svg',
+                                iconSize: [45, 45],
+                                iconAnchor: [22, 22]
+                            })
+                        });
+
+                    }
+
+                    // DESTINATION MARKER
+                    return L.marker(wp.latLng, {
+                        icon: L.icon({
+                            iconUrl: 'house-50.png',
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 40]
+                        })
+                    });
+                },
+
+
                 show: false,
                 addWaypoints: false,
                 routeWhileDragging: false
@@ -382,9 +414,9 @@
                     }
                 },
                 {
-                    enableHighAccuracy: false,
+                    enableHighAccuracy: true,
                     timeout: 20000,
-                    maximumAge: 10000
+                    maximumAge: 0
                 }
             );
         });
