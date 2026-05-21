@@ -249,16 +249,17 @@
             window.addEventListener("deviceorientation", (event) => {
                 //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
                 document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
-                /*if(map.setBearing) {
+                if(map.setBearing) {
                     map.setBearing(parseFloat(event.alpha));
                 } else {
                     console.warn("Map rotation not supported in this Leaflet version.");
-                }*/
+                }
+                /*
                 if(icon_rotation ) {
                     icon_rotation = event.alpha;
                     
 
-                }
+                }*/
                 console.log("Alpha (compass direction):", event.alpha);
                 console.log("Beta front/back tilt:", event.beta);
                 console.log("Gamma (left/right):", event.gamma);
@@ -318,7 +319,7 @@
                                 iconSize: [100, 100],
                                 iconAnchor: [22, 22]
                             }),
-                            rotationAngle: icon_rotation
+                            //rotationAngle: icon_rotation
                         });
 
                     }
