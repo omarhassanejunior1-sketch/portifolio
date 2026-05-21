@@ -13,6 +13,7 @@
      <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
      <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600&display=swap');
@@ -215,21 +216,10 @@
 
     <script>
         
+        // Variables ------------------------------
 
-        function deviceOrientationHandler() {
-            window.addEventListener("deviceorientation", (event) => {
-                //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-                document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
-                if(map.setBearing) {
-                    map.setBearing(parseFloat(event.alpha));
-                } else {
-                    console.warn("Map rotation not supported in this Leaflet version.");
-                }
-                console.log("Alpha (compass direction):", event.alpha);
-                console.log("Beta front/back tilt:", event.beta);
-                console.log("Gamma (left/right):", event.gamma);
-            });
-        }
+        var icon_rotation = 0; 
+        
         // ── State ──────────────────────────────────────────────
         let watchId      = null;
         let lastPosition = null;
@@ -253,7 +243,22 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        
+        // ── Device orientation handling ─────────────────────────
+
+        function deviceOrientationHandler() {
+            window.addEventListener("deviceorientation", (event) => {
+                //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
+                document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
+                if(map.setBearing) {
+                    map.setBearing(parseFloat(event.alpha));
+                } else {
+                    console.warn("Map rotation not supported in this Leaflet version.");
+                }
+                console.log("Alpha (compass direction):", event.alpha);
+                console.log("Beta front/back tilt:", event.beta);
+                console.log("Gamma (left/right):", event.gamma);
+            });
+        }
         // ── Icons ──────────────────────────────────────────────
         const myIcon = L.icon({
             iconUrl: 'bus.svg',
@@ -307,7 +312,8 @@
                                 iconUrl: 'bus.svg',
                                 iconSize: [100, 100],
                                 iconAnchor: [22, 22]
-                            })
+                            }),
+                            rotationAngle: icon_rotation
                         });
 
                     }
@@ -378,7 +384,7 @@
 
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
-                    deviceOrientationHandler() 
+                    //deviceOrientationHandler() 
                     document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
                     console.log(`Speed: ${pos.coords.speed}`)
                     lastPosition = pos;
