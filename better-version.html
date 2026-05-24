@@ -46,10 +46,10 @@
     function deviceOrientationHandler() {
         window.addEventListener("deviceorientation", (event) => {
             //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
+            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${Math.floor(event.alpha)}° `;
             if(map) {
                 // Set bearing instantly
-                map.setBearing(event.alpha);
+                map.setBearing(Math.floor(event.alpha));
 
                 // Animated rotation
                 //map.rotateTo(90, { duration: 1000 });
