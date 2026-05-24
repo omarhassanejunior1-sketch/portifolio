@@ -215,7 +215,7 @@
 
     <script>
         
-
+        // ── Device Orientation Handler ─────────────────────────
         function deviceOrientationHandler() {
             window.addEventListener("deviceorientation", (event) => {
                 //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
@@ -230,6 +230,7 @@
                 console.log("Gamma (left/right):", event.gamma);
             });
         }
+        deviceOrientationHandler() 
         // ── State ──────────────────────────────────────────────
         let watchId      = null;
         let lastPosition = null;
@@ -305,10 +306,10 @@
                         return L.marker(wp.latLng, {
                             icon: L.icon({
                                 iconUrl: 'bus.svg',
-                                iconSize: [32, 100],
-                                iconAnchor: [-16, 50]
+                                iconSize: [100, 100],
+                                iconAnchor: [22, 22]
                             })
-                        });
+                        }).bindPopup(`Carrinha da Unitiva`);
 
                     }
 
@@ -317,9 +318,9 @@
                         icon: L.icon({
                             iconUrl: 'house-50.png',
                             iconSize: [40, 40],
-                            iconAnchor: [16, 16]
+                            iconAnchor: [20, 40]
                         })
-                    });
+                    }).bindPopup(`Destino`);
                 },
 
 
@@ -378,7 +379,7 @@
 
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
-                    deviceOrientationHandler() 
+                    
                     document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
                     console.log(`Speed: ${pos.coords.speed}`)
                     lastPosition = pos;
