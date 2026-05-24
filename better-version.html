@@ -49,10 +49,10 @@
             document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${Math.floor(event.alpha)}° `;
             if(map) {
                 // Set bearing instantly
-                map.setBearing(Math.floor(event.alpha));
+                //map.setBearing(Math.floor(event.alpha));
 
                 // Animated rotation
-                //map.rotateTo(90, { duration: 1000 });
+                map.rotateTo(Math.floor(event.alpha), { duration: 1000 });
 
                 // Using easeTo or flyTo
                 //map.easeTo({ bearing: 135, duration: 800 });
