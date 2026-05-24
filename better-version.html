@@ -47,8 +47,16 @@
         window.addEventListener("deviceorientation", (event) => {
             //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
             document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
-            if(map.easeTo()) {
-                map.easeTo({ bearing: parseInt(event.alpha), duration: 1000 });
+            if(map) {
+                // Set bearing instantly
+                map.setBearing(event.alpha);
+
+                // Animated rotation
+                //map.rotateTo(90, { duration: 1000 });
+
+                // Using easeTo or flyTo
+                //map.easeTo({ bearing: 135, duration: 800 });
+                //map.flyTo({ bearing: 180 });
             } else {
                 console.warn("Map rotation not supported in this Leaflet version.");
             }
@@ -59,7 +67,7 @@
     }
     deviceOrientationHandler()
     // 3. Default blue marker
-    new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
+    const bus = new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
     .setLngLat([-26.019464268539704, 32.40052826494995].reverse()) // ✅ [longitude, latitude] — Maputo, Mozambique
     .setPopup(
         new maplibregl.Popup().setHTML('<b>Maputo</b>')
