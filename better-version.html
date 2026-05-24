@@ -43,6 +43,13 @@
         localIdeographFontFamily: '"Apple LiSung", serif',
         bearing: 90
     });
+    // marker
+    const bus = new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
+    .setLngLat([-26.019464268539704, 32.40052826494995].reverse()) // ✅ [longitude, latitude] — Maputo, Mozambique
+    .setPopup(
+        new maplibregl.Popup().setHTML('<b>Maputo</b>')
+    )
+    .addTo(map)
     function deviceOrientationHandler() {
         window.addEventListener("deviceorientation", (event) => {
             //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
@@ -52,13 +59,17 @@
                 //map.setBearing(Math.floor(event.alpha));
 
                 // Animated rotation
-                map.rotateTo(Math.floor(event.alpha), { duration: 5000 });
+                //map.rotateTo(Math.floor(event.alpha), { duration: 5000 });
 
                 // Using easeTo or flyTo
                 //map.easeTo({ bearing: 135, duration: 800 });
                 //map.flyTo({ bearing: 180 });
             } else {
-                console.warn("Map rotation not supported in this Leaflet version.");
+                //console.warn("Map rotation not supported in this Leaflet version.");
+            }
+            if(bus) {
+                bus.setRotation(Math.floor(event.alpha));
+
             }
             console.log("Alpha (compass direction):", event.alpha);
             console.log("Beta front/back tilt:", event.beta);
@@ -66,13 +77,7 @@
         });
     }
     deviceOrientationHandler()
-    // 3. Default blue marker
-    const bus = new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
-    .setLngLat([-26.019464268539704, 32.40052826494995].reverse()) // ✅ [longitude, latitude] — Maputo, Mozambique
-    .setPopup(
-        new maplibregl.Popup().setHTML('<b>Maputo</b>')
-    )
-    .addTo(map)
+    
 </script>
 </body>
 </html>
