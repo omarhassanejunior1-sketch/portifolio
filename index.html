@@ -273,14 +273,14 @@
         
         */
         // ── Destination marker (draggable visual indicator) ────
-        let destMarker = L.marker([destLat, destLng], {
+        /*let destMarker = L.marker([destLat, destLng], {
             title: 'Destino',icon: L.icon({
                 iconUrl: 'house-50.png',
                 iconSize: [40, 40],
                 iconAnchor: [20, 40]
             }),
             draggable: true
-        }).addTo(map).bindPopup('Destino');
+        }).addTo(map).bindPopup('Destino');*/
         
         // ── Routing helper ─────────────────────────────────────
         function buildRoute(fromLat, fromLng) {
@@ -303,11 +303,7 @@
                     if (i === 0) {
 
                         return L.marker(wp.latLng, {
-                            icon: L.icon({
-                                iconUrl: 'yellow-bus.svg',
-                                iconSize: [100, 100],
-                                iconAnchor: [22, 22]
-                            })
+                            
                         }).bindPopup(`Carrinha da Unitiva`);
 
                     }
@@ -378,7 +374,6 @@
 
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
-                    deviceOrientationHandler() 
                     document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
                     console.log(`Speed: ${pos.coords.speed}`)
                     lastPosition = pos;
