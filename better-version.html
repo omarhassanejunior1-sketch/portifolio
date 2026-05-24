@@ -44,6 +44,7 @@
             console.log("Gamma (left/right):", event.gamma);
         });
     }
+    deviceOrientationHandler()
     // 3. Default blue marker
     new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
     .setLngLat([-26.019464268539704, 32.40052826494995].reverse()) // ✅ [longitude, latitude] — Maputo, Mozambique
