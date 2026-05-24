@@ -219,9 +219,9 @@
         function deviceOrientationHandler() {
             window.addEventListener("deviceorientation", (event) => {
                 //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-                document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
+                document.getElementById('mobile-orientation').textContent = `Beta(X - 180° ) (compass direction): ${Math.floor(event.beta)}° `;
                 if(map.setBearing) {
-                    map.setBearing(parseFloat(event.alpha));
+                    map.setBearing(Math.floor(event.beta));
                 } else {
                     console.warn("Map rotation not supported in this Leaflet version.");
                 }
