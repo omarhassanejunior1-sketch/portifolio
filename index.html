@@ -48,9 +48,14 @@
             <button id="start">Start Tracking</button>
             <span id="location"></span>
         </div>
+        <div id="statusEl"></div>
     </div>
     <div id="map"></div>
     <script>
+        let watchId      = null;
+        let lastPosition = null;
+        let routingControl = null;
+        var statusEl = document.getElementById('statusEl');
         const map = new maplibregl.Map({
         style: `https://tiles.openfreemap.org/styles/bright`,
         center: [ 32.40030973248349,-26.018693909315516],
@@ -125,7 +130,6 @@
             labelLayerId
             );
         });
-        
         // ── Start tracking ─────────────────────────────────────
         document.getElementById('start').addEventListener('click', (e) => {
             e.preventDefault();
@@ -166,7 +170,7 @@
                             break;
                         case err.TIMEOUT:
                             statusEl.textContent = '⏱ Timeout — a tentar novamente...';
-                            retryLocation();
+                            //retryLocation();
                             break;
                     }
 
