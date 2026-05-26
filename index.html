@@ -38,6 +38,10 @@
         width: 100%;
         z-index: 2;
         background: #ffffff;
+
+    }
+    span{
+        color: #333;
     }
   </style>
 </head>
@@ -49,6 +53,7 @@
             <span id="location"></span>
         </div>
         <div id="statusEl"></div>
+        <span id="bearing">Map bearing</span>
     </div>
     <div id="map"></div>
     <script>
@@ -102,6 +107,17 @@
         }
         deviceOrientationHandler() 
         
+
+        ///
+
+        map.on('rotate', () => {
+
+            const bearing = map.getBearing();
+
+            document.getElementById('bearing').innerText =
+                `Bearing: ${bearing.toFixed(2)}°`;
+
+        });
         // The 'building' layer in the streets vector source contains building-height
         // data from OpenStreetMap.
         map.on('load', () => {
