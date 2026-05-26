@@ -9,22 +9,19 @@
   <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css' />
   <script src='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js'></script>
   <style>
-      body { margin: 0; padding: 0; }
-      html, body, #map { height: 100vh; width: 100%; }
-      .btn_container {
+    body { margin: 0; padding: 0; }
+    html, body, #map { height: 100vh; width: 100%; }
+    .btn_container {
         display: flex;
         align-items: center;
         justify-content: center;
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1;
         background: rgba(134, 134, 134, 0.8);
         padding: 10px;
         border-radius: 5px;
         font-family: Arial, sans-serif;
-      }
-      button {
+    }
+
+    button {
         background: #ffffff;
         border: none;
         padding: 5px 15px;
@@ -32,12 +29,25 @@
         cursor: pointer;
         font-size: 16px;
         color: #333;
-      }
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 2;
+        background: #ffffff;
+    }
   </style>
 </head>
 <body>
-    <div class="btn_container">
-        <button id="route">Route</button>
+    <div class="header">
+        <div class="btn_container">
+            <button id="route">Route</button>
+            <button id="start">Start Tracking</button>
+            <span id="location"></span>
+        </div>
     </div>
     <div id="map"></div>
     <script>
@@ -46,7 +56,7 @@
         center: [ 32.40030973248349,-26.018693909315516],
         zoom: 18,
         pitch: 45,
-        bearing: -17.6,
+        bearing: 0,
         container: 'map',
         canvasContextAttributes: {antialias: true}
         });
@@ -54,12 +64,13 @@
         const img = document.createElement("img");
 
             img.src = "bus.svg";
-            img.width = 40;
-            img.height = 40;
+            img.width = 96;
+            img.height = 96;
 
-            new maplibregl.Marker({
+        const marker = new maplibregl.Marker({
             element: img,
-            rotationAlignment: 'map'
+            rotationAlignment: 'map',
+            setRotation: 90
         })
         .setLngLat([32.40054073037627,-26.019383446876837])
         .addTo(map);
@@ -67,15 +78,15 @@
         // data from OpenStreetMap.
         map.on('load', () => {
         // Insert the layer beneath any symbol layer.
-        const layers = map.getStyle().layers;
+            const layers = map.getStyle().layers;
 
-            let labelLayerId;
-            for (let i = 0; i < layers.length; i++) {
-                if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-                labelLayerId = layers[i].id;
-                break;
-                }
-        }
+                let labelLayerId;
+                for (let i = 0; i < layers.length; i++) {
+                    if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                    labelLayerId = layers[i].id;
+                    break;
+                    }
+            }
 
             map.addSource('openfreemap', {
             url: `https://tiles.openfreemap.org/planet`,
@@ -114,23 +125,61 @@
             labelLayerId
             );
         });
-        navigator.geolocation.watchPosition((pos) => {
+        
+        // ── Start tracking ─────────────────────────────────────
+        document.getElementById('start').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            if (!navigator.geolocation) {
+                statusEl.textContent = '⚠ Geolocalização não suportada.';
+                return;
+            }
 
-            const lng = pos.coords.longitude;
-            const lat = pos.coords.latitude;
+            if (watchId !== null) {
+                statusEl.textContent = '… Rastreamento já activo.';
+                return;
+            }
 
-            const bearing = pos.coords.heading;
+            statusEl.textContent = '🔍 A obter localização...';
 
-            marker.setLngLat([lng, lat]);
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    
+                    //document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
+                    //console.log(`Speed: ${pos.coords.speed}`)
+                    lastPosition = pos;
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
 
-            img.style.transform = `rotate(${bearing}deg)`;
+                    document.getElementById('location').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
-            map.easeTo({
-                center: [lng, lat],
-                bearing: bearing,
-                duration: 500
-            });
+                },
+                (err) => {
+                    statusEl.textContent = `⚠ Erro: ${err.message}`;
 
+                    switch (err.code) {
+                        case err.PERMISSION_DENIED:
+                            statusEl.textContent = '⛔ Acesso à localização negado.';
+                            break;
+                        case err.POSITION_UNAVAILABLE:
+                            statusEl.textContent = '⚠ Localização indisponível.';
+                            break;
+                        case err.TIMEOUT:
+                            statusEl.textContent = '⏱ Timeout — a tentar novamente...';
+                            retryLocation();
+                            break;
+                    }
+
+                    if (lastPosition) {
+                        statusEl.textContent += ' (usando última posição conhecida)';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
+                }
+            );
         });
     </script>
 </body>
