@@ -129,7 +129,7 @@
         // ── Start tracking ─────────────────────────────────────
         document.getElementById('start').addEventListener('click', (e) => {
             e.preventDefault();
-            
+            alert("Start tracking clicked!");
             if (!navigator.geolocation) {
                 statusEl.textContent = '⚠ Geolocalização não suportada.';
                 return;
