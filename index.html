@@ -103,6 +103,7 @@
                 console.log("Gamma (left/right):", event.gamma);*/
                 if(marker) {
                     marker.setRotation(Math.floor(event.beta));
+                    map.setLngLat(marker.getLngLat())
 
                 }
             });
