@@ -52,6 +52,7 @@
     </div>
     <div id="map"></div>
     <script>
+        var markerRotation = 0
         let watchId      = null;
         let lastPosition = null;
         let routingControl = null;
@@ -75,10 +76,31 @@
         const marker = new maplibregl.Marker({
             element: img,
             rotationAlignment: 'map',
-            setRotation: 90
+            setRotation: markerRotation
         })
         .setLngLat([32.40054073037627,-26.019383446876837])
         .addTo(map);
+        //
+        function deviceOrientationHandler() {
+            window.addEventListener("deviceorientation", (event) => {
+                //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
+                /*document.getElementById('mobile-orientation').textContent = `Beta(X - 180° ) (compass direction): ${Math.floor(event.beta)}° `;
+                if(map.setBearing) {
+                    map.setBearing(Math.floor(event.beta));
+                } else {
+                    console.warn("Map rotation not supported in this Leaflet version.");
+                }
+                console.log("Alpha (compass direction):", event.alpha);
+                console.log("Beta front/back tilt:", event.beta);
+                console.log("Gamma (left/right):", event.gamma);*/
+                if(marker.setRotation) {
+                    marker.setRotation(Math.floor(event.beta));
+
+                }
+            });
+        }
+        deviceOrientationHandler() 
+        
         // The 'building' layer in the streets vector source contains building-height
         // data from OpenStreetMap.
         map.on('load', () => {
