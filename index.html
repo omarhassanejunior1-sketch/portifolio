@@ -1,440 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Witivi - Raw</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-     <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Exo 2', sans-serif;
-            background: #0b1220;
-            color: #c9d8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: scroll;
-            height: 100vh;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        header {
-            width: 100%;
-            padding: 14px 24px;
-            background: linear-gradient(90deg, #0f1e35, #162840);
-            border-bottom: 1px solid #1e3a5f;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        header span {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 18px;
-            letter-spacing: 3px;
-            color: #4ea8de;
-            text-transform: uppercase;
-        }
-
-        .dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: #4ea8de;
-            animation: pulse 1.6s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.7); }
-        }
-
-        .controls {
-            width: 90%;
-            max-width: 860px;
-            margin: 18px 0 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: flex-end;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 160px;
-        }
-
-        .input-group label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: #4ea8de;
-            text-transform: uppercase;
-        }
-
-        .input-group input {
-            background: #0f1e35;
-            border: 1px solid #1e3a5f;
-            border-radius: 6px;
-            color: #e0ecff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
-            padding: 9px 12px;
-            outline: none;
-            transition: border-color 0.2s;
-            width: 100%;
-        }
-
-        .input-group input:focus {
-            border-color: #4ea8de;
-            box-shadow: 0 0 0 2px rgba(78,168,222,0.15);
-        }
-
-        .input-group input::placeholder {
-            color: #3a5272;
-        }
-
-        button {
-            border: none;
-            border-radius: 7px;
-            font-family: 'Exo 2', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            white-space: nowrap;
-        }
-
-        button:active { transform: scale(0.97); }
-
-        #start {
-            background: #1a6fa8;
-            color: #e0f0ff;
-        }
-        #start:hover { background: #2280bf; }
-
-        #stop {
-            background: #8b2020;
-            color: #ffe0e0;
-        }
-        #stop:hover { background: #a02828; }
-
-        #update-dest {
-            background: #1a5f3a;
-            color: #d0ffe8;
-        }
-        #update-dest:hover { background: #226b45; }
-
-        #status {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            color: #4ea8de;
-            margin-bottom: 6px;
-            width: 90%;
-            max-width: 860px;
-            min-height: 18px;
-            letter-spacing: 1px;
-        }
-        #rotate{
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #rotate span {
-            font-size: 18px;
-        }
-
-        #map {
-            height: 100%;
-            min-height: 500px;
-            width: 90%;
-            max-width: 90%;
-            border-radius: 10px;
-            border: 1px solid #1e3a5f;
-            box-shadow: 0 4px 32px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-        span {
-            display: flex;
-            align-items: center;
-        }
-        span img{
-            margin: 0px 10px;
-            max-height: 48px;
-            height: 48px;
-        }
-    </style>
+  <title>Display buildings in 3D</title>
+  <meta property="og:description" content="Use extrusions to display buildings' height in 3D." />
+  <meta property="og:created" content="2025-06-25" />
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css' />
+  <script src='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js'></script>
+  <style>
+      body { margin: 0; padding: 0; }
+      html, body, #map { height: 100vh; width: 100%; }
+      .btn_container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        background: rgba(134, 134, 134, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+      }
+      button {
+        background: #ffffff;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+      }
+  </style>
 </head>
 <body>
-
-    <header>
-        <div class="dot"></div>
-        <span><img src="logo.svg" alt="">Wutivi Bus Yellow Bus</span>
-    </header>
-
-    <div class="controls">
-        <div class="input-group">
-            <label>Destino — Latitude</label>
-            <input type="number" id="dest-lat" step="any" placeholder="-26.019042" value="-26.019042486045866" />
-        </div>
-        <div class="input-group">
-            <label>Destino — Longitude</label>
-            <input type="number" id="dest-lng" step="any" placeholder="32.400572" value="32.40057233099401" />
-        </div>
-        <button id="update-dest">Actualizar Destino</button>
-        <button id="start">▶ Iniciar</button>
-        <button id="stop">■ Parar</button>
-        <button id="rotate"><span>↻</span> Rodar</button>
-        <br>
-        
+    <div class="btn_container">
+        <button id="route">Route</button>
     </div>
-    <span id="mobile-orientation"> </span>
-    <span id="mobile-speed">  </span>
-    <div id="status">— Aguardando...</div>
     <div id="map"></div>
-
     <script>
-        
+        const map = new maplibregl.Map({
+        style: `https://tiles.openfreemap.org/styles/bright`,
+        center: [ 32.40030973248349,-26.018693909315516],
+        zoom: 18,
+        pitch: 45,
+        bearing: -17.6,
+        container: 'map',
+        canvasContextAttributes: {antialias: true}
+        });
+        //Marker
+        const img = document.createElement("img");
 
-        function deviceOrientationHandler() {
-            window.addEventListener("deviceorientation", (event) => {
-                //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-                document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° `;
-                if(map.setBearing) {
-                    map.setBearing(parseFloat(event.alpha));
-                } else {
-                    console.warn("Map rotation not supported in this Leaflet version.");
+            img.src = "bus.svg";
+            img.width = 40;
+            img.height = 40;
+
+            new maplibregl.Marker({
+            element: img,
+            rotationAlignment: 'map'
+        })
+        .setLngLat([32.40054073037627,-26.019383446876837])
+        .addTo(map);
+        // The 'building' layer in the streets vector source contains building-height
+        // data from OpenStreetMap.
+        map.on('load', () => {
+        // Insert the layer beneath any symbol layer.
+        const layers = map.getStyle().layers;
+
+            let labelLayerId;
+            for (let i = 0; i < layers.length; i++) {
+                if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                labelLayerId = layers[i].id;
+                break;
                 }
-                console.log("Alpha (compass direction):", event.alpha);
-                console.log("Beta front/back tilt:", event.beta);
-                console.log("Gamma (left/right):", event.gamma);
+        }
+
+            map.addSource('openfreemap', {
+            url: `https://tiles.openfreemap.org/planet`,
+            type: 'vector',
             });
-        }
-        // ── State ──────────────────────────────────────────────
-        let watchId      = null;
-        let lastPosition = null;
-        let routingControl = null;
 
-        // Destination (editable via inputs)
-        let destLat = parseFloat(document.getElementById('dest-lat').value);
-        let destLng = parseFloat(document.getElementById('dest-lng').value);
-
-        const statusEl = document.getElementById('status');
-
-        // ── Map setup ──────────────────────────────────────────
-        const map = L.map('map', { 
-            rotate: true ,
-            bearing: 0,
-            touchRotate: true,
-            rotateControl: true,})
-        .setView([-26.018693909315516, 32.40030973248349], 22);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        
-        // ── Icons ──────────────────────────────────────────────
-        const myIcon = L.icon({
-            iconUrl: 'bus.svg',
-            iconSize: [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor: [0, 0]
-        });
-
-        // Static markers
-        /*L.marker([-26.018987531623786, 32.40040846437449])
-            .addTo(map)
-            .bindPopup('Portaria da Unitiva');
-        
-        L.marker([-26.019385702545595, 32.40054715143528], { icon: myIcon })
-            .addTo(map)
-            .bindPopup('Carrinha da Unitiva');
-        
-        */
-        // ── Destination marker (draggable visual indicator) ────
-        /*let destMarker = L.marker([destLat, destLng], {
-            title: 'Destino',icon: L.icon({
-                iconUrl: 'house-50.png',
-                iconSize: [40, 40],
-                iconAnchor: [20, 40]
-            }),
-            draggable: true
-        }).addTo(map).bindPopup('Destino');*/
-        
-        // ── Routing helper ─────────────────────────────────────
-        function buildRoute(fromLat, fromLng) {
-            if (routingControl) {
-                map.removeControl(routingControl);
-                routingControl = null;
-            }
-            routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(fromLat, fromLng),
-                    L.latLng(destLat, destLng)
-                ],
-                lineOptions: {
-                    styles: [{ color: '#4ea8de', weight: 5, opacity: 0.8 }]
-                },
-                // CUSTOM MARKERS
-                createMarker: function(i, wp) {
-
-                    // START MARKER
-                    if (i === 0) {
-
-                        return L.marker(wp.latLng, {
-                            
-                        }).bindPopup(`Carrinha da Unitiva`);
-
-                    }
-
-                    // DESTINATION MARKER
-                    return L.marker(wp.latLng, {
-                        icon: L.icon({
-                            iconUrl: 'house-50.png',
-                            iconSize: [40, 40],
-                            iconAnchor: [20, 40]
-                        })
-                    }).bindPopup(`Destino`);
-                },
-
-
-                show: false,
-                addWaypoints: false,
-                routeWhileDragging: false
-            }).addTo(map);
-        }
-        /// ── Rotate map button ─────────────────────────────────
-        document.getElementById('rotate').addEventListener('click', () => {
-            //map.setBearing(90);  
-            map.setBearing(map.getBearing() + 15);
-            //alert('Funcionalidade de rotação ainda não implementada.'); // Placeholder para futura implementação
-        });
-
-        // ── Update Destination button ──────────────────────────
-        document.getElementById('update-dest').addEventListener('click', () => {
-            const newLat = parseFloat(document.getElementById('dest-lat').value);
-            const newLng = parseFloat(document.getElementById('dest-lng').value);
-
-            if (isNaN(newLat) || isNaN(newLng)) {
-                statusEl.textContent = '⚠ Coordenadas inválidas.';
-                return;
-            }
-
-            destLat = newLat;
-            destLng = newLng;
-
-            // Move destination marker
-            destMarker.setLatLng([destLat, destLng]);
-            destMarker.bindPopup(`Destino: ${destLat.toFixed(6)}, ${destLng.toFixed(6)}`);
-
-            statusEl.textContent = `✔ Destino actualizado → ${destLat.toFixed(6)}, ${destLng.toFixed(6)}`;
-
-            // Rebuild route if we have a last known position
-            if (lastPosition) {
-                buildRoute(lastPosition.coords.latitude, lastPosition.coords.longitude);
-            }
-        });
-
-        // ── Start tracking ─────────────────────────────────────
-        document.getElementById('start').addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (!navigator.geolocation) {
-                statusEl.textContent = '⚠ Geolocalização não suportada.';
-                return;
-            }
-
-            if (watchId !== null) {
-                statusEl.textContent = '… Rastreamento já activo.';
-                return;
-            }
-
-            statusEl.textContent = '🔍 A obter localização...';
-
-            watchId = navigator.geolocation.watchPosition(
-                (pos) => {
-                    document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
-                    console.log(`Speed: ${pos.coords.speed}`)
-                    lastPosition = pos;
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-
-                    statusEl.textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-
-                    buildRoute(lat, lng);
-                },
-                (err) => {
-                    statusEl.textContent = `⚠ Erro: ${err.message}`;
-
-                    switch (err.code) {
-                        case err.PERMISSION_DENIED:
-                            statusEl.textContent = '⛔ Acesso à localização negado.';
-                            break;
-                        case err.POSITION_UNAVAILABLE:
-                            statusEl.textContent = '⚠ Localização indisponível.';
-                            break;
-                        case err.TIMEOUT:
-                            statusEl.textContent = '⏱ Timeout — a tentar novamente...';
-                            retryLocation();
-                            break;
-                    }
-
-                    if (lastPosition) {
-                        statusEl.textContent += ' (usando última posição conhecida)';
-                    }
-                },
+            map.addLayer(
                 {
-                    enableHighAccuracy: true,
-                    timeout: 20000,
-                    maximumAge: 0
-                }
+                    'id': '3d-buildings',
+                    'source': 'openfreemap',
+                    'source-layer': 'building',
+                    'type': 'fill-extrusion',
+                    'minzoom': 15,
+                    'filter': ['!=', ['get', 'hide_3d'], true],
+                    'paint': {
+                    'fill-extrusion-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'render_height'], 0, 'lightgray', 200, 'royalblue', 400, 'lightblue'
+                    ],
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        16,
+                        ['get', 'render_height']
+                    ],
+                    'fill-extrusion-base': ['case',
+                        ['>=', ['get', 'zoom'], 16],
+                        ['get', 'render_min_height'], 0
+                    ]
+                    }
+                },
+            labelLayerId
             );
         });
+        navigator.geolocation.watchPosition((pos) => {
 
-        // ── Stop tracking ──────────────────────────────────────
-        document.getElementById('stop').addEventListener('click', () => {
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-                statusEl.textContent = '🛑 Rastreamento parado.';
-            }
+            const lng = pos.coords.longitude;
+            const lat = pos.coords.latitude;
+
+            const bearing = pos.coords.heading;
+
+            marker.setLngLat([lng, lat]);
+
+            img.style.transform = `rotate(${bearing}deg)`;
+
+            map.easeTo({
+                center: [lng, lat],
+                bearing: bearing,
+                duration: 500
+            });
+
         });
-
-        // ── Retry ──────────────────────────────────────────────
-        function retryLocation() {
-            setTimeout(() => {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        lastPosition = pos;
-                        statusEl.textContent = `✅ Retry OK: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
-                    },
-                    (err) => {
-                        statusEl.textContent = `❌ Retry falhou: ${err.message}`;
-                    }
-                );
-            }, 3000);
-        }
     </script>
 </body>
 </html>
