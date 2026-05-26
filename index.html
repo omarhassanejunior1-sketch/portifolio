@@ -66,8 +66,8 @@
             style: `https://tiles.openfreemap.org/styles/bright`,
             center: [ 32.40030973248349,-26.018693909315516],
             zoom: 18,
-            pitch: 45,
-            bearing: 0,
+            pitch: 0, // x-axis tilt or x rotation 
+            bearing: 30, // z-axis (rotation)
             container: 'map',
             canvasContextAttributes: {antialias: true}
         });
@@ -86,6 +86,8 @@
         })
         .setLngLat([32.40054073037627,-26.019383446876837])
         .addTo(map);
+        // x-axis
+        
         //
         function deviceOrientationHandler() {
             window.addEventListener("deviceorientation", (event) => {
@@ -99,7 +101,7 @@
                 console.log("Alpha (compass direction):", event.alpha);
                 console.log("Beta front/back tilt:", event.beta);
                 console.log("Gamma (left/right):", event.gamma);*/
-                if(marker.setRotation) {
+                if(marker) {
                     marker.setRotation(Math.floor(event.beta));
 
                 }
@@ -110,14 +112,7 @@
 
         ///
 
-        map.on('rotate', () => {
 
-            const bearing = map.getBearing();
-
-            document.getElementById('bearing').innerText =
-                `Bearing: ${bearing.toFixed(2)}°`;
-
-        });
         // The 'building' layer in the streets vector source contains building-height
         // data from OpenStreetMap.
         map.on('load', () => {
