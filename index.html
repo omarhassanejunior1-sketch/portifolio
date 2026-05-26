@@ -102,7 +102,8 @@
                 console.log("Beta front/back tilt:", event.beta);
                 console.log("Gamma (left/right):", event.gamma);*/
                 if(marker) {
-                    marker.setRotation(Math.floor(event.gamma)*-1);
+                    marker.setRotation(Math.floor(event.gamma));
+                    map.MapLibre.setBearing(Math.floor(event.gamma));
                     document.getElementById("bearing").textContent = `Map bearing - gamma: ${Math.floor(event.gamma)}°`;
 
                 }
