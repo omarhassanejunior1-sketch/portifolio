@@ -104,10 +104,10 @@
                 console.log("Alpha (compass direction):", event.alpha);
                 console.log("Beta front/back tilt:", event.beta);
                 console.log("Gamma (left/right):", event.gamma);*/
-                if(marker && event.alpha % 10 === 0) {
+                if(marker ) {
                     marker.setRotation(Math.floor(event.alpha));
                     
-                    document.getElementById("bearing").textContent = `Marker - alpha: ${Math.floor(event.alpha)-7}°`;
+                    document.getElementById("bearing").textContent = `Marker - alpha: ${Math.floor(event.alpha)}°`;
                     map.setBearing(Math.floor(event.alpha));
                 }
             });
