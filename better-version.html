@@ -125,7 +125,7 @@
                 console.log("Beta front/back tilt:", event.beta);
                 console.log("Gamma (left/right):", event.gamma);*/
                 if(marker) {
-                    marker.setRotation(Math.floor(event.alpha));
+                    marker.setRotation(Math.floor(event.alpha)*-1);
                     
                     document.getElementById("bearing").textContent = `Marker - alpha: ${Math.floor(event.alpha)}°`;
                     if(Math.floor(event.alpha) == 90 || Math.floor(event.alpha) == 270 || Math.floor(event.alpha) == 0 || Math.floor(event.alpha) == 180 || Math.floor(event.alpha) == 360) {
