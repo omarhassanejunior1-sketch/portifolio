@@ -1,83 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Use locally generated ideographs</title>
-    <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css' />
-    <script src='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js'></script>
-    <style>
-        body { margin: 0; padding: 0; }
-        html, body, #map { height: 100vh; }
-        #mobile-orientation {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgb(255, 255, 255);
-            padding: 10px;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            z-index: 1;
-            color: #333;
-        }
-    </style>
+  <title>Display buildings in 3D</title>
+  <meta property="og:description" content="Use extrusions to display buildings' height in 3D." />
+  <meta property="og:created" content="2025-06-25" />
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css' />
+  <script src='https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js'></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    html, body, #map { height: 100vh; width: 100%; }
+    .btn_container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(134, 134, 134, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+    }
+
+    button {
+        background: #ffffff;
+        
+        border: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+        margin-right: 10px;
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 2;
+        background: #ffffff;
+
+    }
+    span{
+        color: #333;
+    }
+  </style>
 </head>
 <body>
-    <div id="mobile-orientation">
-        Device Orientation Data
+    <div class="header">
+        <div class="btn_container">
+            <button id="route">Route</button>
+            <button id="start">Start Tracking</button>
+            <span id="location"></span>
+        </div>
+        <div id="statusEl"></div>
+        <span id="bearing">Map bearing</span>
     </div>
     <div id="map"></div>
-
-<script>
-    const el = document.createElement('img');
-    el.src = "bus.svg"; // your image URL
-    el.style.width = '48px';
-    el.style.height = '48px';
-    el.style.cursor = 'pointer';
-    const map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://tiles.openfreemap.org/styles/bright',
-        center: [32.40030973248349, -26.018693909315516], // ✅ [longitude, latitude] — Maputo, Mozambique
-        zoom: 18,
-        attributionControl: false, // Map name 👈 disables it
-        localIdeographFontFamily: '"Apple LiSung", serif',
-        bearing: 90
-    });
-    // marker
-    const bus = new maplibregl.Marker({element: el,rotation: 0, rotationAlignment: 'map' })
-    .setLngLat([-26.019464268539704, 32.40052826494995].reverse()) // ✅ [longitude, latitude] — Maputo, Mozambique
-    .setPopup(
-        new maplibregl.Popup().setHTML('<b>Maputo</b>')
-    )
-    .addTo(map)
-    function deviceOrientationHandler() {
-        window.addEventListener("deviceorientation", (event) => {
-            //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
-            document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${Math.floor(event.alpha)}° `;
-            if(map) {
-                // Set bearing instantly
-                //map.setBearing(Math.floor(event.alpha));
-
-                // Animated rotation
-                //map.rotateTo(Math.floor(event.alpha), { duration: 5000 });
-
-                // Using easeTo or flyTo
-                //map.easeTo({ bearing: 135, duration: 800 });
-                //map.flyTo({ bearing: 180 });
-            } else {
-                //console.warn("Map rotation not supported in this Leaflet version.");
-            }
-            if(bus) {
-                bus.setRotation(Math.floor(event.alpha));
-
-            }
-            console.log("Alpha (compass direction):", event.alpha);
-            console.log("Beta front/back tilt:", event.beta);
-            console.log("Gamma (left/right):", event.gamma);
+    <script>
+        var markerRotation = 0
+        let watchId      = null;
+        let lastPosition = null;
+        let routingControl = null;
+        var statusEl = document.getElementById('statusEl');
+        const map = new maplibregl.Map({
+            style: `https://tiles.openfreemap.org/styles/bright`,
+            
+            center: [ 32.40054676936335,-26.019396124063835],
+            zoom: 18,
+            pitch: 0, // x-axis tilt or x rotation 
+            bearing: 0, // z-axis (rotation)
+            container: 'map',
+            canvasContextAttributes: {antialias: true}
         });
-    }
-    deviceOrientationHandler()
-    
-</script>
+        
+        //Marker
+        const img = document.createElement("img");
+
+            img.src = "Vector.svg";
+            img.width = 96;
+            img.height = 96;
+
+        const marker = new maplibregl.Marker({
+            element: img,
+            rotationAlignment: 'map',
+            setRotation: map.getBearing || null
+        })
+        .setLngLat([32.40054073037627,-26.019383446876837])
+        .addTo(map);
+        // x-axis
+        
+        //
+        function deviceOrientationHandler() {
+            window.addEventListener("deviceorientation", (event) => {
+                //document.getElementById('mobile-orientation').textContent = `Alpha (compass direction): ${event.alpha}° <br> Beta (front/back tilt): ${event.beta}° <br> Gamma (left/right tilt): ${event.gamma}°`;
+                /*document.getElementById('mobile-orientation').textContent = `Beta(X - 180° ) (compass direction): ${Math.floor(event.beta)}° `;
+                if(map.setBearing) {
+                    map.setBearing(Math.floor(event.beta));
+                } else {
+                    console.warn("Map rotation not supported in this Leaflet version.");
+                }
+                console.log("Alpha (compass direction):", event.alpha);
+                console.log("Beta front/back tilt:", event.beta);
+                console.log("Gamma (left/right):", event.gamma);*/
+                if(marker) {
+                    marker.setRotation(Math.floor(event.alpha));
+                    
+                    document.getElementById("bearing").textContent = `Marker - alpha: ${Math.floor(event.alpha)}°`;
+
+                }
+            });
+        }
+        deviceOrientationHandler() 
+        
+
+        ///
+
+
+        // The 'building' layer in the streets vector source contains building-height
+        // data from OpenStreetMap.
+    map.on('load', () => {
+
+        const layers = map.getStyle().layers;
+
+        // Find first label layer
+        let labelLayerId;
+
+        for (let i = 0; i < layers.length; i++) {
+
+            if (
+                layers[i].type === 'symbol' &&
+                layers[i].layout['text-field']
+            ) {
+                labelLayerId = layers[i].id;
+                break;
+            }
+        }
+
+        // ─────────────────────────────
+        // Change map colors
+        // ─────────────────────────────
+        layers.forEach(layer => {
+
+            // Background
+            if (layer.type === 'background') {
+                map.setPaintProperty(
+                    layer.id,
+                    'background-color',
+                    '#ffffff'
+                );
+            }
+
+            // Fill layers
+            if (layer.type === 'fill') {
+
+                if (map.getPaintProperty(layer.id, 'fill-color')) {
+
+                    map.setPaintProperty(
+                        layer.id,
+                        'fill-color',
+                        '#262A35'
+                    );
+                }
+            }
+
+            // Roads
+            if (layer.type === 'line') {
+
+                if (map.getPaintProperty(layer.id, 'line-color')) {
+
+                    map.setPaintProperty(
+                        layer.id,
+                        'line-color',
+                        '#13181C'
+                    );
+                }
+            }
+
+            // Labels
+            if (layer.type === 'symbol') {
+
+                if (map.getPaintProperty(layer.id, 'text-color')) {
+
+                    map.setPaintProperty(
+                        layer.id,
+                        'text-color',
+                        '#717171'
+                    );
+                }
+            }
+        });
+
+        // ─────────────────────────────
+        // Add 3D buildings
+        // ─────────────────────────────
+        map.addSource('openfreemap', {
+            type: 'vector',
+            url: 'https://tiles.openfreemap.org/planet'
+        });
+
+        map.addLayer(
+            {
+                id: '3d-buildings',
+
+                type: 'fill-extrusion',
+
+                source: 'openfreemap',
+
+                'source-layer': 'building',
+
+                minzoom: 15,
+
+                filter: ['!=', ['get', 'hide_3d'], true],
+
+                paint: {
+
+                    // BUILDING COLOR
+                    'fill-extrusion-color': '#1F222B',
+
+                    // BUILDING HEIGHT
+                    'fill-extrusion-height': [
+                        '*',
+                        ['get', 'render_height'],
+                        8
+                    ],
+
+                    // BUILDING BASE
+                    'fill-extrusion-base': [
+                        'coalesce',
+                        ['get', 'render_min_height'],
+                        0
+                    ],
+
+                    // transparency
+                    'fill-extrusion-opacity': 0.95
+                }
+            },
+
+            labelLayerId
+        );
+
+    });
+        // ── Start tracking ─────────────────────────────────────
+        document.getElementById('start').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert("Start tracking clicked!");
+            if (!navigator.geolocation) {
+                statusEl.textContent = '⚠ Geolocalização não suportada.';
+                return;
+            }
+
+            if (watchId !== null) {
+                statusEl.textContent = '… Rastreamento já activo.';
+                return;
+            }
+
+            statusEl.textContent = '🔍 A obter localização...';
+
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    
+                    //document.getElementById('mobile-speed').textContent = `Velocidade: ${pos.coords.speed || 0} m/s ou Velocidade: ${((pos.coords.speed || 0) * 3.6)} km/h`;
+                    //console.log(`Speed: ${pos.coords.speed}`)
+                    lastPosition = pos;
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    //marker.setLngLat([lng , lat])
+                    document.getElementById('location').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                },
+                (err) => {
+                    statusEl.textContent = `⚠ Erro: ${err.message}`;
+
+                    switch (err.code) {
+                        case err.PERMISSION_DENIED:
+                            statusEl.textContent = '⛔ Acesso à localização negado.';
+                            break;
+                        case err.POSITION_UNAVAILABLE:
+                            statusEl.textContent = '⚠ Localização indisponível.';
+                            break;
+                        case err.TIMEOUT:
+                            statusEl.textContent = '⏱ Timeout — a tentar novamente...';
+                            //retryLocation();
+                            break;
+                    }
+
+                    if (lastPosition) {
+                        statusEl.textContent += ' (usando última posição conhecida)';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 20000,
+                    maximumAge: 0
+                }
+            );
+        });
+    </script>
 </body>
 </html>
