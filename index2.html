@@ -13,7 +13,6 @@
      <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
      <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600&display=swap');
 
@@ -165,6 +164,7 @@
         }
 
         #map {
+            position: relative;
             height: 100%;
             min-height: 500px;
             width: 90%;
@@ -182,6 +182,42 @@
             margin: 0px 10px;
             max-height: 48px;
             height: 48px;
+        }
+        .custom-marker{
+            width: 48px;
+            height: 48px;
+            background: #4eacde;
+            background-image: url('bus-station.png');
+            border:none;
+            background-size: cover;
+            background-position: center;
+            border-radius: 6px;
+        }
+        #info{
+            position: absolute;
+            top: 10px;
+            left: 25%;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: #333;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transform: translateX(-300%);
+        }
+        #img-driver{
+            height: 64px;
+            width: 64px;
+            background-image: url('driver.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%; 
+        }
+        #close{
+            font-size: larger;
+            width: 100%;
         }
     </style>
 </head>
@@ -211,10 +247,28 @@
     <span id="mobile-orientation"> </span>
     <span id="mobile-speed">  </span>
     <div id="status">— Aguardando...</div>
-    <div id="map"></div>
+    <div id="map">
+        <div id="info">
+            <h3 id="close">X</h3>
+            <h1>Motorista</h1>
+            <div id="img-driver"></div>
+            <span>Rota: Matola</span>
+        </div>
+    </div>
 
     <script>
-        
+        function showInfo(canShow) {
+            const infoEl = document.getElementById('info');
+            if(canShow === true) {
+                infoEl.style.transform = "translateX(0%)";
+
+            }else{
+                infoEl.style.transform = "translateX(-300%)";
+            }
+        }
+        document.getElementById('close').addEventListener('click', () => {
+            showInfo(false);
+        });
         // ── Device Orientation Handler ─────────────────────────
         function deviceOrientationHandler() {
             window.addEventListener("deviceorientation", (event) => {
@@ -230,7 +284,7 @@
                 console.log("Gamma (left/right):", event.gamma);
             });
         }
-        deviceOrientationHandler() 
+        //deviceOrientationHandler() 
         // ── State ──────────────────────────────────────────────
         let watchId      = null;
         let lastPosition = null;
@@ -262,17 +316,26 @@
             iconAnchor: [25, 25],
             popupAnchor: [0, 0]
         });
-
+        
+        
         // Static markers
-        /*L.marker([-26.018987531623786, 32.40040846437449])
-            .addTo(map)
-            .bindPopup('Portaria da Unitiva');
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div class="custom-marker"></div>`,
+            iconSize: [48, 48],
+            iconAnchor: [0, 0]
+        });
+
+        const driverMarker = L.marker([-26.019177676087775, 32.399976057346926], {
+            icon: customIcon
+        }).addTo(map).bindPopup('Carrinha da Unitiva');
+
+        driverMarker.on('click', (e) => {
+            showInfo(true);
+        });
+
+
         
-        L.marker([-26.019385702545595, 32.40054715143528], { icon: myIcon })
-            .addTo(map)
-            .bindPopup('Carrinha da Unitiva');
-        
-        */
         // ── Destination marker (draggable visual indicator) ────
         let destMarker = L.marker([destLat, destLng], {
             title: 'Destino',icon: L.icon({
@@ -282,6 +345,8 @@
             }),
             draggable: true
         }).addTo(map).bindPopup('Destino');
+
+
         
         // ── Routing helper ─────────────────────────────────────
         function buildRoute(fromLat, fromLng) {
@@ -304,12 +369,12 @@
                     if (i === 0) {
 
                         return L.marker(wp.latLng, {
-                            icon: L.icon({
-                                iconUrl: 'bus.svg',
-                                iconSize: [100, 100],
-                                iconAnchor: [22, 22]
-                            })
-                        }).bindPopup(`Carrinha da Unitiva`);
+                            icon: L.divIcon({
+                            className: 'custom-marker',
+                            html: `<div class="custom-marker"></div>`,
+                            iconSize: [48, 48],
+                            iconAnchor: [0, 0]
+                        })}).bindPopup(`Carrinha da Unitiva`);
 
                     }
 
@@ -417,7 +482,7 @@
                 }
             );
         });
-
+        
         // ── Stop tracking ──────────────────────────────────────
         document.getElementById('stop').addEventListener('click', () => {
             if (watchId !== null) {
