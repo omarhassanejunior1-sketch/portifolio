@@ -108,7 +108,7 @@
                     marker.setRotation(Math.floor(event.alpha));
                     
                     document.getElementById("bearing").textContent = `Marker - alpha: ${Math.floor(event.alpha)}°`;
-
+                    map.setBearing(Math.floor(event.alpha));
                 }
             });
         }
