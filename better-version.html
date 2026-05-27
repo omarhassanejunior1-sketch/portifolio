@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Display buildings in 3D</title>
+  <title>Better Version of wutivi library</title>
   <meta property="og:description" content="Use extrusions to display buildings' height in 3D." />
   <meta property="og:created" content="2025-06-25" />
   <meta charset='utf-8'>
@@ -45,6 +45,17 @@
     span{
         color: #333;
     }
+    #student-marker {
+        width: 64px;
+        height: 64px;
+        background-color: #ffffff;
+        background-image: url('aiony.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -59,6 +70,7 @@
     </div>
     <div id="map"></div>
     <script>
+        const DEST   = [32.390776798423644, -26.01502328365628];
         var markerRotation = 0
         let watchId      = null;
         let lastPosition = null;
@@ -75,12 +87,11 @@
             canvasContextAttributes: {antialias: true}
         });
         
-        //Marker
+        //Main Marker (Arrow icon)
         const img = document.createElement("img");
-
-            img.src = "Vector.svg";
-            img.width = 96/2;
-            img.height = 96;
+        img.src = "Vector.svg";
+        img.width = 96/2;
+        img.height = 96;
 
         const marker = new maplibregl.Marker({
             element: img,
@@ -89,8 +100,17 @@
         })
         .setLngLat([ 32.40054676936335,-26.019396124063835])
         .addTo(map);
-        // x-axis
-        
+        // Student Marker (Circle icon)
+        const studentElement = document.createElement("div");
+        studentElement.id="student-marker";
+        const studentMarker = new maplibregl.Marker({
+            element: studentElement,
+            rotationAlignment: 'map'
+        })
+        .setLngLat([ 32.40075929135938, -26.0187987991407])
+        .addTo(map);
+
+
         //
         function deviceOrientationHandler() {
             window.addEventListener("deviceorientation", (event) => {
@@ -130,6 +150,41 @@
         // data from OpenStreetMap.
     map.on('load', () => {
 
+
+        //
+        // Route coordinates
+        const route = {
+            type: 'Feature',
+            geometry: {
+                type: 'LineString',
+                coordinates: [
+                    [ 32.40054676936335 , -26.019396124063835 ],
+                    DEST
+                ]
+            }
+        };
+
+        // Add source
+        map.addSource('route', {
+            type: 'geojson',
+            data: route
+        });
+
+        // Add route line
+        /*map.addLayer({
+            id: 'route',
+            type: 'line',
+            source: 'route',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+            },
+            paint: {
+                'line-color': '#22CBEA',
+                'line-width': 18
+            }
+        });*/
+        map.moveLayer('route');
         const layers = map.getStyle().layers;
 
         // Find first label layer
@@ -174,7 +229,7 @@
             }
 
             // Roads
-            if (layer.type === 'line') {
+            if (layer.type === 'line' && layer.id !== 'route') {
 
                 if (map.getPaintProperty(layer.id, 'line-color')) {
 
@@ -183,7 +238,7 @@
                         'line-color',
                         '#13181C'
                     );
-                }
+                }layer.type === 'line' && layer.id !== 'route'
             }
 
             // Labels
@@ -194,7 +249,18 @@
                     map.setPaintProperty(
                         layer.id,
                         'text-color',
-                        '#717171'
+                        '#22CBEA'
+                    );
+                    map.setLayoutProperty(
+                        layer.id,
+                        'text-font',
+                        ['Noto Sans Bold']
+                    );
+                    // Stroke / outline
+                    map.setPaintProperty(
+                        layer.id,
+                        'text-halo-color',
+                        '#000000'
                     );
                 }
             }
@@ -274,7 +340,7 @@
                     lastPosition = pos;
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
-                    //marker.setLngLat([lng , lat])
+                    marker.setLngLat([lng , lat])
                     document.getElementById('location').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
                 },
