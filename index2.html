@@ -215,6 +215,31 @@
             background-position: center;
             border-radius: 50%; 
         }
+        .sudent-marker{
+            position: relative;
+            height: 64px;
+            width: 64px;
+            background-image: url('aiony.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%; 
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 5px rgba(255,255,255,0.8);
+        }
+        .sudent-marker p{
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #333;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 12px;
+        }
         #close{
             font-size: larger;
             width: 100%;
@@ -319,6 +344,16 @@
         
         
         // Static markers
+
+        const sutdentMarker = L.marker([-26.017736562038532, 32.39965565671842], {
+            icon: L.divIcon({
+                className: 'sudent-marker',
+                html: `<div class="sudent-marker"><p>Kaycy Peal</p></div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            })
+        }).addTo(map).bindPopup('Estudante da Wutivi');
+
         const customIcon = L.divIcon({
             className: 'custom-marker',
             html: `<div class="custom-marker"></div>`,
@@ -328,7 +363,7 @@
 
         const driverMarker = L.marker([-26.019177676087775, 32.399976057346926], {
             icon: customIcon
-        }).addTo(map).bindPopup('Carrinha da Unitiva');
+        }).addTo(map).bindPopup('Carrinha da Wutivi');
 
         driverMarker.on('click', (e) => {
             showInfo(true);
