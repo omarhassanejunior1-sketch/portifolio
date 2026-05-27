@@ -342,7 +342,7 @@
                     const lng = pos.coords.longitude;
                     marker.setLngLat([lng , lat])
                     document.getElementById('location').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-
+                    map.setCenter([lng , lat]);
                 },
                 (err) => {
                     statusEl.textContent = `⚠ Erro: ${err.message}`;
