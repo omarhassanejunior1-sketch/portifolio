@@ -10,13 +10,16 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Leaflet Smart Road Routing</title>
+    <title>Leaflet GPS Road Router</title>
 
-    <!-- Leaflet CSS -->
+
+    <!-- Leaflet -->
+
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
+
 
     <style>
 
@@ -26,25 +29,45 @@
             padding: 0;
         }
 
+
         html,
         body {
+
             width: 100%;
             height: 100%;
+
             overflow: hidden;
+
             font-family: Arial, sans-serif;
+
         }
 
-        /* =========================
-           HEADER
-        ========================= */
+
+        body {
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        /*
+        ========================================
+        HEADER
+        ========================================
+        */
 
         header {
 
             height: 64px;
+
             width: 100%;
 
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
 
             padding: 0 20px;
@@ -55,15 +78,19 @@
 
             position: relative;
 
-            z-index: 1000;
+            z-index: 2000;
+
         }
+
 
         .logo {
 
             font-size: 20px;
 
             font-weight: bold;
+
         }
+
 
         .status {
 
@@ -74,36 +101,206 @@
             gap: 10px;
 
             font-size: 13px;
+
         }
+
 
         .status-dot {
 
             width: 10px;
+
             height: 10px;
 
             background: #22c55e;
 
             border-radius: 50%;
+
         }
 
-        /* =========================
-           MAP
-        ========================= */
+
+        /*
+        ========================================
+        MAP
+        ========================================
+        */
 
         #map {
 
             width: 100%;
 
             height: calc(100vh - 64px);
+
         }
 
-        /* =========================
-           USER MARKER
-        ========================= */
+
+        /*
+        ========================================
+        CONTROLS
+        ========================================
+        */
+
+        .controls {
+
+            position: absolute;
+
+            top: 84px;
+
+            left: 20px;
+
+            z-index: 1500;
+
+            width: 280px;
+
+            padding: 15px;
+
+            background: white;
+
+            border-radius: 10px;
+
+            box-shadow:
+                0 3px 15px rgba(0,0,0,0.25);
+
+        }
+
+
+        .controls h3 {
+
+            margin-bottom: 12px;
+
+            font-size: 16px;
+
+        }
+
+
+        .controls label {
+
+            display: block;
+
+            margin-top: 8px;
+
+            margin-bottom: 4px;
+
+            font-size: 12px;
+
+            color: #555;
+
+        }
+
+
+        .controls input {
+
+            width: 100%;
+
+            height: 38px;
+
+            padding: 0 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            outline: none;
+
+        }
+
+
+        .controls input:focus {
+
+            border-color: #2563eb;
+
+        }
+
+
+        .button-row {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 12px;
+
+        }
+
+
+        .controls button {
+
+            flex: 1;
+
+            height: 38px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+        }
+
+
+        #addWaypointButton {
+
+            background: #2563eb;
+
+            color: white;
+
+        }
+
+
+        #rerouteButton {
+
+            background: #16a34a;
+
+            color: white;
+
+        }
+
+
+        #clearWaypointsButton {
+
+            width: 100%;
+
+            margin-top: 8px;
+
+            background: #eee;
+
+            color: #222;
+
+        }
+
+
+        /*
+        ========================================
+        ROUTE INFORMATION
+        ========================================
+        */
+
+        .route-info {
+
+            margin-top: 12px;
+
+            padding-top: 10px;
+
+            border-top: 1px solid #eee;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+
+        /*
+        ========================================
+        USER MARKER
+        ========================================
+        */
 
         .location-marker {
 
             width: 42px;
+
             height: 42px;
 
             border-radius: 50%;
@@ -113,10 +310,12 @@
             border: 4px solid white;
 
             box-shadow:
-                0 2px 10px rgba(0, 0, 0, 0.35);
+                0 2px 10px rgba(0,0,0,0.35);
 
             position: relative;
+
         }
+
 
         .location-marker::after {
 
@@ -125,6 +324,7 @@
             position: absolute;
 
             width: 14px;
+
             height: 14px;
 
             background: white;
@@ -132,19 +332,25 @@
             border-radius: 50%;
 
             top: 50%;
+
             left: 50%;
 
             transform:
                 translate(-50%, -50%);
+
         }
 
-        /* =========================
-           DESTINATION MARKER
-        ========================= */
+
+        /*
+        ========================================
+        DESTINATION MARKER
+        ========================================
+        */
 
         .destination-marker {
 
             width: 42px;
+
             height: 42px;
 
             background: #ff05d5;
@@ -157,16 +363,19 @@
             transform: rotate(-45deg);
 
             box-shadow:
-                0 2px 10px rgba(0, 0, 0, 0.35);
+                0 2px 10px rgba(0,0,0,0.35);
 
             position: relative;
+
         }
+
 
         .destination-marker::after {
 
             content: "";
 
             width: 12px;
+
             height: 12px;
 
             background: white;
@@ -176,26 +385,69 @@
             position: absolute;
 
             top: 50%;
+
             left: 50%;
 
             transform:
                 translate(-50%, -50%);
+
         }
 
-        /* =========================
-           LOCATION BUTTON
-        ========================= */
+
+        /*
+        ========================================
+        WAYPOINT MARKER
+        ========================================
+        */
+
+        .waypoint-marker {
+
+            width: 30px;
+
+            height: 30px;
+
+            background: #f59e0b;
+
+            border: 3px solid white;
+
+            border-radius: 50%;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.35);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+        }
+
+
+        /*
+        ========================================
+        GPS BUTTON
+        ========================================
+        */
 
         .location-button {
 
             position: absolute;
 
             right: 20px;
+
             top: 84px;
 
-            z-index: 1000;
+            z-index: 1500;
 
             width: 45px;
+
             height: 45px;
 
             border: none;
@@ -205,16 +457,29 @@
             border-radius: 8px;
 
             box-shadow:
-                0 2px 8px rgba(0, 0, 0, 0.25);
+                0 2px 8px rgba(0,0,0,0.25);
 
             cursor: pointer;
 
             font-size: 20px;
+
         }
 
-        .location-button:hover {
 
-            background: #f5f5f5;
+        /*
+        ========================================
+        ROUTE STATUS
+        ========================================
+        */
+
+        .route-status {
+
+            margin-top: 8px;
+
+            font-size: 12px;
+
+            color: #555;
+
         }
 
     </style>
@@ -224,1212 +489,1452 @@
 
 <body>
 
-    <!-- =========================
-         HEADER
-    ========================= -->
 
-    <header>
+<header>
 
-        <div class="logo">
-            My Router
-        </div>
-
-        <div class="status">
-
-            <span id="latitude">
-                Latitude: --
-            </span>
-
-            <span id="longitude">
-                Longitude: --
-            </span>
-
-            <span class="status-dot"></span>
-
-            <span id="status">
-                Searching location...
-            </span>
-
-        </div>
-
-    </header>
+    <div class="logo">
+        My Router
+    </div>
 
 
-    <!-- =========================
-         MAP
-    ========================= -->
+    <div class="status">
 
-    <div id="map"></div>
+        <span id="latitude">
+            Latitude: --
+        </span>
+
+        <span id="longitude">
+            Longitude: --
+        </span>
+
+        <span class="status-dot"></span>
+
+        <span id="status">
+            Searching location...
+        </span>
+
+    </div>
+
+</header>
 
 
-    <!-- =========================
-         LOCATION BUTTON
-    ========================= -->
 
-    <button
-        id="locationButton"
-        class="location-button"
-        title="My location"
+<!--
+========================================
+WAYPOINT CONTROLS
+========================================
+-->
+
+<div class="controls">
+
+    <h3>
+        Add road waypoint
+    </h3>
+
+
+    <label>
+        Latitude
+    </label>
+
+    <input
+        id="waypointLatitude"
+        type="number"
+        step="any"
+        placeholder="-25.9653"
     >
-        ◎
+
+
+    <label>
+        Longitude
+    </label>
+
+    <input
+        id="waypointLongitude"
+        type="number"
+        step="any"
+        placeholder="32.5892"
+    >
+
+
+    <div class="button-row">
+
+        <button id="addWaypointButton">
+            Add marker
+        </button>
+
+        <button id="rerouteButton">
+            Reroute
+        </button>
+
+    </div>
+
+
+    <button id="clearWaypointsButton">
+        Clear markers
     </button>
 
 
-    <!-- Leaflet JS -->
+    <div class="route-info">
 
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-    </script>
+        <div>
+            Distance:
+            <strong id="distance">
+                --
+            </strong>
+        </div>
+
+        <div>
+            Estimated time:
+            <strong id="duration">
+                --
+            </strong>
+        </div>
+
+        <div class="route-status" id="routeStatus">
+            Route not loaded
+        </div>
+
+    </div>
+
+</div>
 
 
-    <script>
 
-        /* =====================================================
-           MAP
-        ===================================================== */
+<!--
+========================================
+MAP
+========================================
+-->
 
-        const map = L.map("map", {
+<div id="map"></div>
 
-            zoomControl: true,
 
-            attributionControl: true
+<button
+    id="locationButton"
+    class="location-button"
+    title="My location"
+>
+    ◎
+</button>
+
+
+
+<!-- Leaflet -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+
+<script>
+
+
+/*
+==================================================
+MAP
+==================================================
+*/
+
+const map = L.map("map");
+
+
+L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+
+        maxZoom: 19,
+
+        attribution:
+            "&copy; OpenStreetMap contributors"
+
+    }
+).addTo(map);
+
+
+
+/*
+==================================================
+DESTINATION
+==================================================
+
+This ALWAYS remains the final waypoint.
+*/
+
+const destination = {
+
+    lat: -26.018612071741043,
+
+    lng: 32.40030467080537
+
+};
+
+
+
+/*
+==================================================
+ICONS
+==================================================
+*/
+
+const userIcon = L.divIcon({
+
+    className: "",
+
+    html: `
+        <div class="location-marker"></div>
+    `,
+
+    iconSize: [42, 42],
+
+    iconAnchor: [21, 21]
+
+});
+
+
+const destinationIcon = L.divIcon({
+
+    className: "",
+
+    html: `
+        <div class="destination-marker"></div>
+    `,
+
+    iconSize: [42, 42],
+
+    iconAnchor: [21, 42]
+
+});
+
+
+/*
+==================================================
+CREATE DESTINATION
+==================================================
+*/
+
+const destinationMarker = L.marker(
+
+    [
+        destination.lat,
+        destination.lng
+    ],
+
+    {
+        icon: destinationIcon
+    }
+
+).addTo(map);
+
+
+destinationMarker.bindPopup(
+    "<b>Destination</b><br>Final waypoint"
+);
+
+
+
+/*
+==================================================
+VARIABLES
+==================================================
+*/
+
+
+let userMarker = null;
+
+
+/*
+The actual road-following route.
+*/
+
+let routeLine = null;
+
+
+/*
+Current GPS position.
+*/
+
+let currentPosition = null;
+
+
+/*
+Added waypoint markers.
+
+These are NOT automatically part of
+the route until Reroute is pressed.
+*/
+
+let waypoints = [];
+
+
+/*
+Prevent multiple OSRM requests
+at the same time.
+*/
+
+let routingInProgress = false;
+
+
+/*
+Used to prevent constant rerouting.
+*/
+
+let lastReroutePosition = null;
+
+
+/*
+Distance from route at which
+automatic rerouting happens.
+
+50 meters is an example.
+*/
+
+const OFF_ROUTE_DISTANCE = 50;
+
+
+
+/*
+==================================================
+OSRM ROUTING FUNCTION
+==================================================
+*/
+
+async function fetchRoute() {
+
+    /*
+    We need a current GPS position
+    before creating the route.
+    */
+
+    if (!currentPosition) {
+
+        console.log(
+            "Waiting for GPS position..."
+        );
+
+        return;
+
+    }
+
+
+    /*
+    Prevent duplicate requests.
+    */
+
+    if (routingInProgress) {
+
+        return;
+
+    }
+
+
+    routingInProgress = true;
+
+
+    document.getElementById(
+        "routeStatus"
+    ).textContent =
+        "Fetching road route...";
+
+
+    /*
+    ==============================================
+    BUILD ROUTE POINTS
+    ==============================================
+
+    IMPORTANT:
+
+    OSRM expects:
+
+    longitude,latitude
+
+    NOT:
+
+    latitude,longitude
+    */
+
+
+    const points = [];
+
+
+    /*
+    1. CURRENT USER POSITION
+    */
+
+    points.push({
+
+        lat: currentPosition.lat,
+
+        lng: currentPosition.lng
+
+    });
+
+
+    /*
+    2. ADDED WAYPOINTS
+    */
+
+    for (const waypoint of waypoints) {
+
+        points.push({
+
+            lat: waypoint.lat,
+
+            lng: waypoint.lng
 
         });
 
-
-        /* =====================================================
-           OPEN STREET MAP
-        ===================================================== */
-
-        L.tileLayer(
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            {
-
-                maxZoom: 19,
-
-                attribution:
-                    "&copy; OpenStreetMap contributors"
-
-            }
-        ).addTo(map);
+    }
 
 
-        /* =====================================================
-           DESTINATION
-        ===================================================== */
+    /*
+    3. DESTINATION
 
-        const destination = {
+    Destination is ALWAYS last.
+    */
 
-            lat: -26.013358729770413,
+    points.push({
 
-            lng: 32.387546704753305
+        lat: destination.lat,
+
+        lng: destination.lng
+
+    });
+
+
+    /*
+    ==============================================
+    CONVERT TO OSRM FORMAT
+    ==============================================
+    */
+
+    const coordinates =
+        points
+            .map(point => {
+
+                return `${point.lng},${point.lat}`;
+
+            })
+            .join(";");
+
+
+    /*
+    ==============================================
+    OSRM REQUEST
+    ==============================================
+
+    geometries=geojson
+
+    gives us the road geometry.
+
+    overview=full
+
+    gives us the complete route.
+
+    steps=false
+
+    means we do NOT request
+    turn-by-turn instructions.
+    */
+
+    const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${coordinates}` +
+        `?overview=full` +
+        `&geometries=geojson` +
+        `&steps=false`;
+
+
+    try {
+
+        const response =
+            await fetch(url);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (data.code !== "Ok") {
+
+            throw new Error(
+                data.message ||
+                "OSRM routing failed"
+            );
+
+        }
+
+
+        /*
+        ==========================================
+        GET FIRST ROUTE
+        ==========================================
+        */
+
+        const route =
+            data.routes[0];
+
+
+        /*
+        ==========================================
+        ROUTE GEOMETRY
+        ==========================================
+        */
+
+        const geometry =
+            route.geometry;
+
+
+        /*
+        GeoJSON coordinates are:
+
+        [longitude, latitude]
+
+        Leaflet expects:
+
+        [latitude, longitude]
+        */
+
+
+        const leafletCoordinates =
+            geometry.coordinates.map(
+                coordinate => {
+
+                    return [
+
+                        coordinate[1],
+
+                        coordinate[0]
+
+                    ];
+
+                }
+            );
+
+
+        /*
+        ==========================================
+        DRAW ROAD ROUTE
+        ==========================================
+        */
+
+        if (!routeLine) {
+
+            routeLine =
+                L.polyline(
+
+                    leafletCoordinates,
+
+                    {
+
+                        color: "#2563eb",
+
+                        weight: 7,
+
+                        opacity: 0.85,
+
+                        lineJoin: "round",
+
+                        lineCap: "round"
+
+                    }
+
+                ).addTo(map);
+
+        } else {
+
+            routeLine.setLatLngs(
+                leafletCoordinates
+            );
+
+        }
+
+
+        /*
+        ==========================================
+        ROUTE INFORMATION
+        ==========================================
+        */
+
+        const distanceKm =
+            route.distance / 1000;
+
+
+        const durationMinutes =
+            route.duration / 60;
+
+
+        document.getElementById(
+            "distance"
+        ).textContent =
+            `${distanceKm.toFixed(2)} km`;
+
+
+        document.getElementById(
+            "duration"
+        ).textContent =
+            formatDuration(
+                durationMinutes
+            );
+
+
+        document.getElementById(
+            "routeStatus"
+        ).textContent =
+            "Road route loaded";
+
+
+        /*
+        Remember where the route
+        was calculated from.
+        */
+
+        lastReroutePosition = {
+
+            lat: currentPosition.lat,
+
+            lng: currentPosition.lng
 
         };
 
 
-        /* =====================================================
-           USER ICON
-        ===================================================== */
+        /*
+        Fit the complete route
+        into the map.
+        */
 
-        const userIcon = L.divIcon({
-
-            className: "",
-
-            html: `
-                <div class="location-marker"></div>
-            `,
-
-            iconSize: [42, 42],
-
-            iconAnchor: [21, 21]
-
-        });
-
-
-        /* =====================================================
-           DESTINATION ICON
-        ===================================================== */
-
-        const destinationIcon = L.divIcon({
-
-            className: "",
-
-            html: `
-                <div class="destination-marker"></div>
-            `,
-
-            iconSize: [42, 42],
-
-            iconAnchor: [21, 42]
-
-        });
-
-
-        /* =====================================================
-           DESTINATION MARKER
-        ===================================================== */
-
-        const destinationMarker = L.marker(
-
-            [
-                destination.lat,
-                destination.lng
-            ],
-
+        map.fitBounds(
+            routeLine.getBounds(),
             {
-                icon: destinationIcon
+
+                padding: [50, 50]
+
             }
-
-        ).addTo(map);
-
-
-        destinationMarker.bindPopup(
-            "<b>Destination</b><br>Final location"
         );
 
 
-        /* =====================================================
-           USER MARKER
-        ===================================================== */
+        console.log(
+            "OSRM route:",
+            route
+        );
 
-        let userMarker = null;
 
+    } catch (error) {
 
-        /* =====================================================
-           CURRENT GPS POSITION
-        ===================================================== */
-
-        let currentPosition = null;
-
-
-        /* =====================================================
-           CACHED ROUTE
-           
-           THIS IS THE IMPORTANT PART.
-           
-           The route fetched from OSRM is stored here.
-        ===================================================== */
-
-        let cachedRoute = null;
-
-
-        /*
-         Example structure:
-
-         cachedRoute = {
-
-             coordinates: [
-                 [lat, lng],
-                 [lat, lng],
-                 [lat, lng]
-             ],
-
-             distance: 12345
-
-         }
-        */
-
-
-        /* =====================================================
-           ROUTE DRAWING
-        ===================================================== */
-
-        let routeLine = null;
-
-
-        /* =====================================================
-           ROUTING STATE
-        ===================================================== */
-
-        let routingInProgress = false;
-
-
-        /* =====================================================
-           OFF-ROUTE SETTINGS
-        ===================================================== */
-
-        /*
-         How far the user can move away from
-         the cached road before a new route
-         is requested.
-        */
-
-        const OFF_ROUTE_DISTANCE = 50;
-
-
-        /*
-         Number of consecutive GPS readings that
-         must be off-route before we request
-         a new route.
-
-         This prevents one inaccurate GPS reading
-         from triggering a routing request.
-        */
-
-        const OFF_ROUTE_CONFIRMATIONS = 3;
-
-
-        let offRouteCounter = 0;
-
-
-        /* =====================================================
-           DISTANCE BETWEEN TWO GPS POINTS
-        ===================================================== */
-
-        function distanceInMeters(
-            lat1,
-            lng1,
-            lat2,
-            lng2
-        ) {
-
-            const R = 6371000;
-
-            const dLat =
-                (lat2 - lat1) *
-                Math.PI / 180;
-
-            const dLng =
-                (lng2 - lng1) *
-                Math.PI / 180;
-
-
-            const a =
-
-                Math.sin(dLat / 2) *
-                Math.sin(dLat / 2)
-
-                +
-
-                Math.cos(
-                    lat1 * Math.PI / 180
-                )
-
-                *
-
-                Math.cos(
-                    lat2 * Math.PI / 180
-                )
-
-                *
-
-                Math.sin(dLng / 2) *
-                Math.sin(dLng / 2);
-
-
-            const c =
-                2 *
-                Math.atan2(
-                    Math.sqrt(a),
-                    Math.sqrt(1 - a)
-                );
-
-
-            return R * c;
-        }
-
-
-        /* =====================================================
-           POINT TO LINE SEGMENT DISTANCE
-           
-           This is used to determine whether the
-           user is still close to the cached route.
-        ===================================================== */
-
-        function pointToSegmentDistance(
-
-            pointLat,
-            pointLng,
-
-            startLat,
-            startLng,
-
-            endLat,
-            endLng
-
-        ) {
-
-            /*
-             Convert latitude/longitude into
-             approximate meters.
-
-             This works well for the relatively
-             short distances normally involved
-             in route tracking.
-            */
-
-            const latFactor =
-                111320;
-
-            const lngFactor =
-                111320 *
-                Math.cos(
-                    pointLat *
-                    Math.PI / 180
-                );
-
-
-            const px =
-                pointLng * lngFactor;
-
-            const py =
-                pointLat * latFactor;
-
-
-            const x1 =
-                startLng * lngFactor;
-
-            const y1 =
-                startLat * latFactor;
-
-
-            const x2 =
-                endLng * lngFactor;
-
-            const y2 =
-                endLat * latFactor;
-
-
-            const dx =
-                x2 - x1;
-
-            const dy =
-                y2 - y1;
-
-
-            /*
-             If the segment has no length,
-             calculate distance directly.
-            */
-
-            if (dx === 0 && dy === 0) {
-
-                return Math.sqrt(
-
-                    Math.pow(px - x1, 2) +
-
-                    Math.pow(py - y1, 2)
-
-                );
-
-            }
-
-
-            /*
-             Find the closest point on the
-             line segment.
-            */
-
-            let t = (
-
-                (px - x1) * dx +
-
-                (py - y1) * dy
-
-            ) / (
-
-                dx * dx +
-
-                dy * dy
-
-            );
-
-
-            /*
-             Keep the point inside the segment.
-            */
-
-            t = Math.max(
-                0,
-                Math.min(1, t)
-            );
-
-
-            const closestX =
-                x1 + t * dx;
-
-
-            const closestY =
-                y1 + t * dy;
-
-
-            /*
-             Calculate distance from the
-             user's GPS position to the
-             closest point on the road segment.
-            */
-
-            return Math.sqrt(
-
-                Math.pow(
-                    px - closestX,
-                    2
-                )
-
-                +
-
-                Math.pow(
-                    py - closestY,
-                    2
-                )
-
-            );
-
-        }
-
-
-        /* =====================================================
-           FIND DISTANCE TO CACHED ROUTE
-        ===================================================== */
-
-        function distanceToRoute(
-            userLat,
-            userLng
-        ) {
-
-            /*
-             No route means we cannot calculate
-             distance from the route.
-            */
-
-            if (
-                !cachedRoute ||
-                !cachedRoute.coordinates ||
-                cachedRoute.coordinates.length < 2
-            ) {
-
-                return Infinity;
-
-            }
-
-
-            let minimumDistance =
-                Infinity;
-
-
-            const coordinates =
-                cachedRoute.coordinates;
-
-
-            /*
-             Check every road segment.
-
-             Segment 1:
-
-             point 1 → point 2
-
-             Segment 2:
-
-             point 2 → point 3
-
-             Segment 3:
-
-             point 3 → point 4
-
-             etc.
-            */
-
-            for (
-                let i = 0;
-                i < coordinates.length - 1;
-                i++
-            ) {
-
-                const start =
-                    coordinates[i];
-
-
-                const end =
-                    coordinates[i + 1];
-
-
-                const distance =
-                    pointToSegmentDistance(
-
-                        userLat,
-                        userLng,
-
-                        start[0],
-                        start[1],
-
-                        end[0],
-                        end[1]
-
-                    );
-
-
-                if (
-                    distance <
-                    minimumDistance
-                ) {
-
-                    minimumDistance =
-                        distance;
-
-                }
-
-            }
-
-
-            return minimumDistance;
-
-        }
-
-
-        /* =====================================================
-           DRAW CACHED ROUTE
-        ===================================================== */
-
-        function drawCachedRoute() {
-
-            /*
-             Nothing to draw.
-            */
-
-            if (
-                !cachedRoute ||
-                !cachedRoute.coordinates
-            ) {
-
-                return;
-
-            }
-
-
-            /*
-             First request:
-             create the Leaflet line.
-            */
-
-            if (!routeLine) {
-
-                routeLine =
-                    L.polyline(
-
-                        cachedRoute.coordinates,
-
-                        {
-
-                            color: "#2563eb",
-
-                            weight: 7,
-
-                            opacity: 0.85,
-
-                            lineCap: "round",
-
-                            lineJoin: "round"
-
-                        }
-
-                    ).addTo(map);
-
-            }
-
-            /*
-             Later:
-             reuse the same route.
-
-             NO FETCH.
-             
-             NO OSRM REQUEST.
-            */
-
-            else {
-
-                routeLine.setLatLngs(
-                    cachedRoute.coordinates
-                );
-
-            }
-
-        }
-
-
-        /* =====================================================
-           FETCH NEW ROAD ROUTE
-        ===================================================== */
-
-        async function fetchRoute(
-            userLat,
-            userLng
-        ) {
-
-            /*
-             Don't start another request while
-             one is already running.
-            */
-
-            if (routingInProgress) {
-
-                return;
-
-            }
-
-
-            routingInProgress = true;
-
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "Calculating route...";
-
-
-            try {
-
-                /*
-                 OSRM expects:
-
-                 longitude,latitude
-
-                 not:
-
-                 latitude,longitude
-                */
-
-                const url =
-
-                    `https://router.project-osrm.org/route/v1/driving/` +
-
-                    `${userLng},${userLat};` +
-
-                    `${destination.lng},${destination.lat}` +
-
-                    `?overview=full&geometries=geojson`;
-
-
-                /*
-                 THIS is the network request.
-
-                 It happens only when fetchRoute()
-                 is called.
-                */
-
-                const response =
-                    await fetch(url);
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Routing server error"
-                    );
-
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-
-                    data.code !== "Ok" ||
-
-                    !data.routes ||
-
-                    data.routes.length === 0
-
-                ) {
-
-                    throw new Error(
-                        "No route found"
-                    );
-
-                }
-
-
-                /* =================================================
-                   GET ROUTE
-                ================================================= */
-
-                const route =
-                    data.routes[0];
-
-
-                /*
-                 OSRM coordinates:
-
-                 [longitude, latitude]
-                */
-
-                const osrmCoordinates =
-                    route
-                        .geometry
-                        .coordinates;
-
-
-                /*
-                 Convert to Leaflet:
-
-                 [latitude, longitude]
-                */
-
-                const leafletCoordinates =
-
-                    osrmCoordinates.map(
-                        coordinate => [
-
-                            coordinate[1],
-
-                            coordinate[0]
-
-                        ]
-                    );
-
-
-                /* =================================================
-                   CACHE THE ROUTE
-                ================================================= */
-
-                cachedRoute = {
-
-                    coordinates:
-                        leafletCoordinates,
-
-                    distance:
-                        route.distance
-
-                };
-
-
-                /*
-                 Reset off-route detection.
-
-                 We are now following a new route.
-                */
-
-                offRouteCounter = 0;
-
-
-                /* =================================================
-                   DRAW THE FETCHED ROUTE
-                ================================================= */
-
-                drawCachedRoute();
-
-
-                /* =================================================
-                   SHOW DISTANCE
-                ================================================= */
-
-                const distanceKm =
-
-                    (
-                        route.distance / 1000
-                    ).toFixed(2);
-
-
-                document.getElementById(
-                    "status"
-                ).textContent =
-
-                    `Route: ${distanceKm} km`;
-
-
-                console.log(
-                    "NEW ROUTE FETCHED"
-                );
-
-                console.log(
-                    "Route points:",
-                    leafletCoordinates.length
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Routing error:",
-                    error
-                );
-
-
-                document.getElementById(
-                    "status"
-                ).textContent =
-                    "Unable to calculate route";
-
-            }
-
-            finally {
-
-                routingInProgress = false;
-
-            }
-
-        }
-
-
-        /* =====================================================
-           CHECK IF USER LEFT THE ROUTE
-        ===================================================== */
-
-        function checkRoutePosition(
-            userLat,
-            userLng
-        ) {
-
-            /*
-             If we don't have a cached route,
-             we need to fetch one.
-            */
-
-            if (!cachedRoute) {
-
-                fetchRoute(
-                    userLat,
-                    userLng
-                );
-
-                return;
-
-            }
-
-
-            /*
-             Calculate distance between user
-             and the cached road.
-            */
-
-            const distance =
-                distanceToRoute(
-                    userLat,
-                    userLng
-                );
-
-
-            console.log(
-                "Distance from route:",
-                distance.toFixed(1),
-                "meters"
-            );
-
-
-            /* =================================================
-               USER IS STILL ON ROUTE
-            ================================================= */
-
-            if (
-                distance <=
-                OFF_ROUTE_DISTANCE
-            ) {
-
-                /*
-                 Reset the counter.
-
-                 The user is back on/near
-                 the route.
-                */
-
-                offRouteCounter = 0;
-
-
-                document.getElementById(
-                    "status"
-                ).textContent =
-                    "Following route";
-
-
-                return;
-
-            }
-
-
-            /* =================================================
-               USER IS OFF ROUTE
-            ================================================= */
-
-            offRouteCounter++;
-
-
-            document.getElementById(
-                "status"
-            ).textContent =
-
-                `Off route (${offRouteCounter}/${OFF_ROUTE_CONFIRMATIONS})`;
-
-
-            /*
-             Don't immediately request a new route.
-
-             Wait for several GPS readings.
-            */
-
-            if (
-                offRouteCounter >=
-                OFF_ROUTE_CONFIRMATIONS
-            ) {
-
-                console.log(
-                    "User left route. Fetching new route..."
-                );
-
-
-                fetchRoute(
-                    userLat,
-                    userLng
-                );
-
-            }
-
-        }
-
-
-        /* =====================================================
-           GPS UPDATE
-        ===================================================== */
-
-        function updatePosition(
-            position
-        ) {
-
-            const userLat =
-                position.coords.latitude;
-
-
-            const userLng =
-                position.coords.longitude;
-
-
-            /* =================================================
-               SAVE CURRENT POSITION
-            ================================================= */
-
-            currentPosition = {
-
-                lat: userLat,
-
-                lng: userLng
-
-            };
-
-
-            /* =================================================
-               UPDATE HEADER
-            ================================================= */
-
-            document.getElementById(
-                "latitude"
-            ).textContent =
-
-                `Latitude: ${userLat.toFixed(6)}`;
-
-
-            document.getElementById(
-                "longitude"
-            ).textContent =
-
-                `Longitude: ${userLng.toFixed(6)}`;
-
-
-            /* =================================================
-               UPDATE USER MARKER
-            ================================================= */
-
-            if (!userMarker) {
-
-                userMarker =
-
-                    L.marker(
-
-                        [
-                            userLat,
-                            userLng
-                        ],
-
-                        {
-                            icon: userIcon
-                        }
-
-                    ).addTo(map);
-
-
-                userMarker.bindPopup(
-                    "<b>Your location</b>"
-                );
-
-            }
-
-            else {
-
-                /*
-                 Move marker locally.
-
-                 NO ROUTING REQUEST.
-                */
-
-                userMarker.setLatLng(
-
-                    [
-                        userLat,
-                        userLng
-                    ]
-
-                );
-
-            }
-
-
-            /* =================================================
-               CHECK CACHED ROUTE
-            ================================================= */
-
-            checkRoutePosition(
-                userLat,
-                userLng
-            );
-
-
-            /* =================================================
-               MOVE MAP
-            ================================================= */
-
-            map.setView(
-
-                [
-                    userLat,
-                    userLng
-                ],
-
-                16
-
-            );
-
-        }
-
-
-        /* =====================================================
-           GPS ERROR
-        ===================================================== */
-
-        function locationError(
+        console.error(
+            "Routing error:",
             error
-        ) {
-
-            console.error(
-                "GPS error:",
-                error
-            );
+        );
 
 
-            document.getElementById(
-                "status"
-            ).textContent =
-                "Location unavailable";
+        document.getElementById(
+            "routeStatus"
+        ).textContent =
+            "Could not fetch road route.";
+
+    }
 
 
-            map.setView(
+    routingInProgress = false;
 
-                [
-                    -26.013364090508237, 
-                    32.387576529983754,
-                ],
-
-                13
-
-            );
-
-        }
+}
 
 
-        /* =====================================================
-           START GPS TRACKING
-        ===================================================== */
 
-        if (
-            "geolocation" in navigator
-        ) {
+/*
+==================================================
+FORMAT DURATION
+==================================================
+*/
 
-            navigator.geolocation.watchPosition(
+function formatDuration(minutes) {
 
-                updatePosition,
+    const totalMinutes =
+        Math.round(minutes);
 
-                locationError,
+
+    const hours =
+        Math.floor(
+            totalMinutes / 60
+        );
+
+
+    const remainingMinutes =
+        totalMinutes % 60;
+
+
+    if (hours > 0) {
+
+        return `${hours}h ${remainingMinutes}min`;
+
+    }
+
+
+    return `${remainingMinutes} min`;
+
+}
+
+
+
+/*
+==================================================
+GPS POSITION
+==================================================
+*/
+
+function updateRoute(position) {
+
+    const lat =
+        position.coords.latitude;
+
+
+    const lng =
+        position.coords.longitude;
+
+
+    /*
+    Update UI.
+    */
+
+    document.getElementById(
+        "latitude"
+    ).textContent =
+        `Latitude: ${lat.toFixed(6)}`;
+
+
+    document.getElementById(
+        "longitude"
+    ).textContent =
+        `Longitude: ${lng.toFixed(6)}`;
+
+
+    /*
+    Store current position.
+    */
+
+    currentPosition = {
+
+        lat: lat,
+
+        lng: lng
+
+    };
+
+
+    /*
+    ==============================================
+    USER MARKER
+    ==============================================
+    */
+
+    if (!userMarker) {
+
+        userMarker =
+            L.marker(
+
+                [lat, lng],
 
                 {
-
-                    enableHighAccuracy: true,
-
-                    maximumAge: 0,
-
-                    timeout: 10000
-
+                    icon: userIcon
                 }
 
+            ).addTo(map);
+
+
+        userMarker.bindPopup(
+            "<b>Your location</b>"
+        );
+
+
+    } else {
+
+        userMarker.setLatLng(
+            [lat, lng]
+        );
+
+    }
+
+
+    /*
+    ==============================================
+    FIRST ROUTE
+    ==============================================
+
+    Fetch only once initially.
+    */
+
+    if (!routeLine) {
+
+        fetchRoute();
+
+    }
+
+
+    /*
+    ==============================================
+    OFF-ROUTE CHECK
+    ==============================================
+    */
+
+    if (routeLine) {
+
+        checkIfOffRoute(
+            lat,
+            lng
+        );
+
+    }
+
+
+    /*
+    ==============================================
+    STATUS
+    ==============================================
+    */
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "Location tracking";
+
+}
+
+
+
+/*
+==================================================
+CHECK IF USER LEFT THE ROAD ROUTE
+==================================================
+*/
+
+function checkIfOffRoute(
+    lat,
+    lng
+) {
+
+    if (!routeLine) {
+
+        return;
+
+    }
+
+
+    /*
+    Current GPS point.
+    */
+
+    const userPoint =
+        L.latLng(
+            lat,
+            lng
+        );
+
+
+    /*
+    Leaflet gives us all route
+    segments.
+
+    We calculate the closest
+    distance to the route.
+    */
+
+    const coordinates =
+        routeLine.getLatLngs();
+
+
+    let shortestDistance =
+        Infinity;
+
+
+    for (
+        let i = 0;
+        i < coordinates.length - 1;
+        i++
+    ) {
+
+        const start =
+            coordinates[i];
+
+
+        const end =
+            coordinates[i + 1];
+
+
+        const distance =
+            distanceToSegment(
+                userPoint,
+                start,
+                end
             );
+
+
+        if (
+            distance <
+            shortestDistance
+        ) {
+
+            shortestDistance =
+                distance;
 
         }
 
-        else {
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "GPS not supported";
-
-        }
+    }
 
 
-        /* =====================================================
-           MY LOCATION BUTTON
-        ===================================================== */
+    /*
+    User is outside the route.
+    */
 
-        document
-            .getElementById(
-                "locationButton"
-            )
-            .addEventListener(
+    if (
+        shortestDistance >
+        OFF_ROUTE_DISTANCE
+    ) {
 
-                "click",
-
-                function () {
-
-                    if (
-                        !currentPosition
-                    ) {
-
-                        return;
-
-                    }
+        document.getElementById(
+            "routeStatus"
+        ).textContent =
+            `Off route (${Math.round(shortestDistance)} m)`;
 
 
-                    map.setView(
+        /*
+        Reroute.
 
-                        [
-                            currentPosition.lat,
+        The new route starts
+        from the CURRENT user position.
 
-                            currentPosition.lng
-                        ],
+        Existing waypoints remain.
 
-                        17
+        Destination remains last.
+        */
 
-                    );
+        fetchRoute();
 
-                }
+    }
 
-            );
+}
 
 
-        /* =====================================================
-           INITIAL MAP VIEW
-        ===================================================== */
 
-        map.setView(
+/*
+==================================================
+DISTANCE FROM GPS POINT TO ROUTE SEGMENT
+==================================================
+*/
 
-            [
-                destination.lat,
+/*
+This uses a local planar approximation.
 
-                destination.lng
-            ],
+For short road segments this is
+sufficient for deciding whether the
+user is approximately 50m away.
+*/
 
-            13
+function distanceToSegment(
+    point,
+    start,
+    end
+) {
+
+    const metersPerDegreeLat =
+        111320;
+
+
+    const metersPerDegreeLng =
+        111320 *
+        Math.cos(
+            point.lat *
+            Math.PI /
+            180
+        );
+
+
+    const px =
+        point.lng *
+        metersPerDegreeLng;
+
+
+    const py =
+        point.lat *
+        metersPerDegreeLat;
+
+
+    const sx =
+        start.lng *
+        metersPerDegreeLng;
+
+
+    const sy =
+        start.lat *
+        metersPerDegreeLat;
+
+
+    const ex =
+        end.lng *
+        metersPerDegreeLng;
+
+
+    const ey =
+        end.lat *
+        metersPerDegreeLat;
+
+
+    const dx =
+        ex - sx;
+
+
+    const dy =
+        ey - sy;
+
+
+    if (
+        dx === 0 &&
+        dy === 0
+    ) {
+
+        return Math.sqrt(
+
+            Math.pow(px - sx, 2) +
+
+            Math.pow(py - sy, 2)
 
         );
 
-    </script>
+    }
+
+
+    let t =
+        (
+            (px - sx) * dx +
+            (py - sy) * dy
+        ) /
+        (
+            dx * dx +
+            dy * dy
+        );
+
+
+    t =
+        Math.max(
+            0,
+            Math.min(1, t)
+        );
+
+
+    const closestX =
+        sx + t * dx;
+
+
+    const closestY =
+        sy + t * dy;
+
+
+    return Math.sqrt(
+
+        Math.pow(
+            px - closestX,
+            2
+        ) +
+
+        Math.pow(
+            py - closestY,
+            2
+        )
+
+    );
+
+}
+
+
+
+/*
+==================================================
+ADD WAYPOINT MARKER
+==================================================
+*/
+
+document
+    .getElementById(
+        "addWaypointButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+
+            const lat =
+                parseFloat(
+                    document.getElementById(
+                        "waypointLatitude"
+                    ).value
+                );
+
+
+            const lng =
+                parseFloat(
+                    document.getElementById(
+                        "waypointLongitude"
+                    ).value
+                );
+
+
+            /*
+            Validate coordinates.
+            */
+
+            if (
+                Number.isNaN(lat) ||
+                Number.isNaN(lng)
+            ) {
+
+                alert(
+                    "Enter a valid latitude and longitude."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                lat < -90 ||
+                lat > 90
+            ) {
+
+                alert(
+                    "Latitude must be between -90 and 90."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                lng < -180 ||
+                lng > 180
+            ) {
+
+                alert(
+                    "Longitude must be between -180 and 180."
+                );
+
+                return;
+
+            }
+
+
+            /*
+            ======================================
+            WAYPOINT NUMBER
+            ======================================
+            */
+
+            const number =
+                waypoints.length + 1;
+
+
+            /*
+            ======================================
+            CREATE MARKER
+            ======================================
+            */
+
+            const waypointIcon =
+                L.divIcon({
+
+                    className: "",
+
+                    html: `
+                        <div class="waypoint-marker">
+                            ${number}
+                        </div>
+                    `,
+
+                    iconSize: [30, 30],
+
+                    iconAnchor: [15, 15]
+
+                });
+
+
+            const marker =
+                L.marker(
+
+                    [lat, lng],
+
+                    {
+                        icon: waypointIcon
+                    }
+
+                ).addTo(map);
+
+
+            marker.bindPopup(
+                `<b>Waypoint ${number}</b><br>
+                 ${lat.toFixed(6)}, ${lng.toFixed(6)}`
+            );
+
+
+            /*
+            ======================================
+            STORE WAYPOINT
+            ======================================
+            */
+
+            waypoints.push({
+
+                lat: lat,
+
+                lng: lng,
+
+                marker: marker
+
+            });
+
+
+            /*
+            ======================================
+            CLEAR INPUTS
+            ======================================
+            */
+
+            document.getElementById(
+                "waypointLatitude"
+            ).value = "";
+
+
+            document.getElementById(
+                "waypointLongitude"
+            ).value = "";
+
+
+            document.getElementById(
+                "routeStatus"
+            ).textContent =
+                `${waypoints.length} waypoint marker(s) added. Press Reroute.`;
+
+
+            /*
+            IMPORTANT:
+
+            We DO NOT call fetchRoute() here.
+
+            Therefore the existing road line
+            remains unchanged.
+
+            Only pressing Reroute changes
+            the road route.
+            */
+
+        }
+    );
+
+
+
+/*
+==================================================
+REROUTE BUTTON
+==================================================
+*/
+
+document
+    .getElementById(
+        "rerouteButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            if (!currentPosition) {
+
+                alert(
+                    "Waiting for your GPS position."
+                );
+
+                return;
+
+            }
+
+
+            fetchRoute();
+
+        }
+    );
+
+
+
+/*
+==================================================
+CLEAR WAYPOINTS
+==================================================
+*/
+
+document
+    .getElementById(
+        "clearWaypointsButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+
+            /*
+            Remove markers from map.
+            */
+
+            waypoints.forEach(
+                waypoint => {
+
+                    map.removeLayer(
+                        waypoint.marker
+                    );
+
+                }
+            );
+
+
+            /*
+            Empty waypoint array.
+            */
+
+            waypoints = [];
+
+
+            document.getElementById(
+                "routeStatus"
+            ).textContent =
+                "Waypoints cleared. Press Reroute.";
+
+        }
+    );
+
+
+
+/*
+==================================================
+GPS ERROR
+==================================================
+*/
+
+function locationError(error) {
+
+    console.error(
+        "Location error:",
+        error
+    );
+
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "Location unavailable";
+
+
+    /*
+    Maputo fallback.
+    */
+
+    map.setView(
+
+        [
+            -26.01863135471041,
+            32.400283213133065
+        ],
+
+        13
+
+    );
+
+}
+
+
+
+/*
+==================================================
+START GPS TRACKING
+==================================================
+*/
+
+if (
+    "geolocation" in navigator
+) {
+
+    navigator.geolocation.watchPosition(
+
+        updateRoute,
+
+        locationError,
+
+        {
+
+            enableHighAccuracy: true,
+
+            maximumAge: 0,
+
+            timeout: 10000
+
+        }
+
+    );
+
+} else {
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "GPS not supported";
+
+}
+
+
+
+/*
+==================================================
+MY LOCATION BUTTON
+==================================================
+*/
+
+document
+    .getElementById(
+        "locationButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+
+            if (!currentPosition) {
+
+                return;
+
+            }
+
+
+            map.setView(
+
+                [
+                    currentPosition.lat,
+                    currentPosition.lng
+                ],
+
+                17
+
+            );
+
+        }
+    );
+
+
+</script>
 
 </body>
 
